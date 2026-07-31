@@ -1,0 +1,17 @@
+{
+  "name": "el-galpon-del-polin-frontend",
+  "version": "1.0.0",
+  "description": "Frontend para El Galpón del Polín - Venta de polines",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python3 -m http.server 8000 --directory . --bind 127.0.0.1",
+    "start": "python3 -m http.server 3000 --directory . --bind 127.0.0.1"
+  },
+  "keywords": [
+    "polines",
+    "venta",
+    "frontend"
+  ],
+  "author": "El Galpón del Polín",
+  "license": "ISC"
+}

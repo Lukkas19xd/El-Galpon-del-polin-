@@ -1,0 +1,38 @@
+{
+  "name": "el-galpon-del-polin-backend",
+  "version": "1.0.0",
+  "description": "Backend API REST para El Galpón del Polín - Venta de polines",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "jest --forceExit",
+    "test:watch": "jest --watch",
+    "seed": "node seed.js"
+  },
+  "keywords": [
+    "polines",
+    "venta",
+    "api",
+    "express"
+  ],
+  "author": "El Galpón del Polín",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^13.0.2",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-validator": "^7.0.0",
+    "jsonwebtoken": "^9.0.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.6.1",
+    "nodemon": "^2.0.22",
+    "supertest": "^6.3.3"
+  }
+}

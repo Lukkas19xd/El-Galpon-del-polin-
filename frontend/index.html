@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>El Galpón del Polín - Venta de Polines</title>
+  <link rel="stylesheet" href="src/styles/styles.css">
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <div class="navbar-logo">
+        <span class="logo-icon">📦</span>
+        <span>El Galpón del Polín</span>
+      </div>
+      <ul class="nav-menu">
+        <li><a href="#" onclick="cambiarVista('inicio')">Inicio</a></li>
+        <li><a href="#" onclick="cambiarVista('productos')">Productos</a></li>
+        <li class="carrito-link">
+          <a href="#" onclick="cambiarVista('carrito')">
+            Carrito <span class="carrito-contador" id="carritoContador">0</span>
+          </a>
+        </li>
+        <li id="menuDashboard" style="display:none;">
+          <a href="#" onclick="cambiarVista('dashboard')">Dashboard</a>
+        </li>
+        <li id="menuMisReservas" style="display:none;">
+          <a href="#" onclick="cambiarVista('mis-reservas')">Mis Reservas</a>
+        </li>
+        <li id="menuPerfil" style="display:none;">
+          <a href="#" onclick="cambiarVista('perfil')">Perfil</a>
+        </li>
+        <li id="menuAdmin" style="display:none;">
+          <a href="#" onclick="cambiarVista('admin')">Administrador</a>
+        </li>
+        <li id="btnLogin">
+          <a href="#" onclick="cambiarVista('login')" class="btn-login">Iniciar Sesión</a>
+        </li>
+        <li id="btnLogout" style="display:none;">
+          <a href="#" onclick="cerrarSesion()" class="btn-logout">Cerrar Sesión</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- Sección: Inicio -->
+    <section id="seccion-inicio" class="vista-activa">
+      <div class="hero">
+        <div class="hero-content">
+          <h1>El Galpón del Polín</h1>
+          <p>Venta especializada de polines de calidad industrial y estándar</p>
+          <button class="btn-primario" onclick="cambiarVista('productos')">Ver Catálogo</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección: Login -->
+    <section id="seccion-login" class="contenedor">
+      <div class="auth-container">
+        <div class="auth-box">
+          <h2>Iniciar Sesión</h2>
+          <form id="formLogin" onsubmit="handleLogin(event)">
+            <div class="form-group">
+              <label for="loginEmail">Email:</label>
+              <input type="email" id="loginEmail" required>
+            </div>
+            <div class="form-group">
+              <label for="loginPassword">Contraseña:</label>
+              <input type="password" id="loginPassword" required>
+            </div>
+            <button type="submit" class="btn-primario">Iniciar Sesión</button>
+            <p class="texto-cambio">¿No tienes cuenta? <a href="#" onclick="cambiarVista('registro')">Registrarse</a></p>
+          </form>
+          <div id="loginError" class="error-message"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección: Registro -->
+    <section id="seccion-registro" class="contenedor">
+      <div class="auth-container">
+        <div class="auth-box">
+          <h2>Crear Cuenta</h2>
+          <form id="formRegistro" onsubmit="handleRegistro(event)">
+            <div class="form-group">
+              <label for="regNombre">Nombre:</label>
+              <input type="text" id="regNombre" required>
+            </div>
+            <div class="form-group">
+              <label for="regEmail">Email:</label>
+              <input type="email" id="regEmail" required>
+            </div>
+            <div class="form-group">
+              <label for="regPassword">Contraseña:</label>
+              <input type="password" id="regPassword" required>
+            </div>
+            <div class="form-group">
+              <label for="regConfirm">Confirmar Contraseña:</label>
+              <input type="password" id="regConfirm" required>
+            </div>
+            <button type="submit" class="btn-primario">Registrarse</button>
+            <p class="texto-cambio">¿Ya tienes cuenta? <a href="#" onclick="cambiarVista('login')">Iniciar Sesión</a></p>
+          </form>
+          <div id="regError" class="error-message"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección: Productos -->
+    <section id="seccion-productos" class="contenedor">
+      <h2>Catálogo de Productos</h2>
+      <div class="filtros">
+        <select id="filtroTipo" onchange="aplicarFiltros()">
+          <option value="">Todos los tipos</option>
+          <option value="impregnado">Impregnado</option>
+          <option value="estandar">Estándar</option>
+        </select>
+        <select id="filtroCategoria" onchange="aplicarFiltros()">
+          <option value="">Todas las categorías</option>
+          <option value="industrial">Industrial</option>
+          <option value="construccion">Construcción</option>
+          <option value="agricola">Agrícola</option>
+        </select>
+      </div>
+      <div id="productosGrid" class="productos-grid">
+        <!-- Los productos se cargarán aquí -->
+      </div>
+    </section>
+
+    <!-- Sección: Dashboard -->
+    <section id="seccion-dashboard" class="contenedor" style="display:none;">
+      <h2>Dashboard</h2>
+      <div id="dashboardStats" class="dashboard-stats"></div>
+    </section>
+
+    <!-- Sección: Mis Reservas -->
+    <section id="seccion-mis-reservas" class="contenedor" style="display:none;">
+      <h2>Mis Reservas</h2>
+      <div class="filtros">
+        <input id="busquedaCodigo" type="text" placeholder="Buscar por código de reserva...">
+        <button class="btn-primario" onclick="buscarReservaPorCodigo()">Buscar</button>
+      </div>
+      <div id="misReservasResultados"></div>
+    </section>
+
+    <!-- Sección: Carrito -->
+    <section id="seccion-carrito" class="contenedor">
+      <h2>Carrito de Compras</h2>
+      <div id="carritoVacio" class="carrito-vacio">
+        <p>Tu carrito está vacío</p>
+        <button class="btn-primario" onclick="cambiarVista('productos')">Continuar Comprando</button>
+      </div>
+      <div id="carritoContenido" style="display:none;">
+        <table class="carrito-tabla">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Precio</th>
+              <th>Cantidad</th>
+              <th>Subtotal</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="carritoItems"></tbody>
+        </table>
+        <div class="carrito-total">
+          <h3>Total: $<span id="carritoTotal">0</span></h3>
+        </div>
+        <div class="carrito-acciones">
+          <button class="btn-secundario" onclick="cambiarVista('productos')">Seguir Comprando</button>
+          <button class="btn-primario" onclick="cambiarVista('checkout')">Finalizar Compra</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección: Checkout -->
+    <section id="seccion-checkout" class="contenedor">
+      <h2>Finalizar Compra</h2>
+      <form id="formCheckout" onsubmit="handleCompra(event)">
+        <div class="checkout-grid">
+          <div class="checkout-seccion">
+            <h3>Resumen del Pedido</h3>
+            <div id="resumenPedido"></div>
+          </div>
+          <div class="checkout-seccion">
+            <h3>Dirección de Entrega</h3>
+            <div class="form-group">
+              <label>Calle:</label>
+              <input type="text" id="checkoutCalle" required>
+            </div>
+            <div class="form-group">
+              <label>Número:</label>
+              <input type="text" id="checkoutNumero" required>
+            </div>
+            <div class="form-group">
+              <label>Ciudad:</label>
+              <input type="text" id="checkoutCiudad" required>
+            </div>
+            <div class="form-group">
+              <label>Código Postal:</label>
+              <input type="text" id="checkoutCP" required>
+            </div>
+            <h3>Método de Pago</h3>
+            <div class="form-group">
+              <label>
+                <input type="radio" name="metodoPago" value="efectivo" checked> Efectivo
+              </label>
+              <label>
+                <input type="radio" name="metodoPago" value="tarjeta"> Tarjeta de Crédito
+              </label>
+              <label>
+                <input type="radio" name="metodoPago" value="transferencia"> Transferencia Bancaria
+              </label>
+            </div>
+            <button type="submit" class="btn-primario">Completar Pedido</button>
+          </div>
+        </div>
+      </form>
+      <div id="checkoutError" class="error-message"></div>
+    </section>
+
+    <!-- Sección: Perfil -->
+    <section id="seccion-perfil" class="contenedor">
+      <h2>Mi Perfil</h2>
+      <div class="perfil-container">
+        <div class="perfil-seccion">
+          <h3>Información Personal</h3>
+          <form id="formPerfil" onsubmit="handleActualizarPerfil(event)">
+            <div class="form-group">
+              <label>Nombre:</label>
+              <input type="text" id="perfilNombre">
+            </div>
+            <div class="form-group">
+              <label>Email:</label>
+              <input type="email" id="perfilEmail" disabled>
+            </div>
+            <div class="form-group">
+              <label>Teléfono:</label>
+              <input type="tel" id="perfilTelefono">
+            </div>
+            <div class="form-group">
+              <label>Dirección:</label>
+              <input type="text" id="perfilDireccion">
+            </div>
+            <div class="form-group">
+              <label>Ciudad:</label>
+              <input type="text" id="perfilCiudad">
+            </div>
+            <button type="submit" class="btn-primario">Guardar Cambios</button>
+          </form>
+        </div>
+        <div class="perfil-seccion">
+          <h3>Mis Pedidos</h3>
+          <div id="misPedidos"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección: Administrador -->
+    <section id="seccion-admin" class="contenedor">
+      <h2>Panel de Administrador</h2>
+      <div class="admin-tabs">
+        <button class="tab-btn active" onclick="cambiarTab('admin-productos')">Productos</button>
+        <button class="tab-btn" onclick="cambiarTab('admin-pedidos')">Pedidos</button>
+        <button class="tab-btn" onclick="cambiarTab('admin-usuarios')">Usuarios</button>
+      </div>
+
+      <!-- Tab: Productos -->
+      <div id="admin-productos" class="admin-tab-content">
+        <h3>Gestionar Productos</h3>
+        <button class="btn-primario" onclick="mostrarFormNuevoProducto()">Nuevo Producto</button>
+        <form id="formNuevoProducto" style="display:none;" onsubmit="handleNuevoProducto(event)">
+          <div class="form-group">
+            <label>Nombre:</label>
+            <input type="text" id="adminProdNombre" required>
+          </div>
+          <div class="form-group">
+            <label>Descripción:</label>
+            <textarea id="adminProdDesc" required></textarea>
+          </div>
+          <div class="form-group">
+            <label>Precio:</label>
+            <input type="number" id="adminProdPrecio" step="0.01" required>
+          </div>
+          <div class="form-group">
+            <label>Stock:</label>
+            <input type="number" id="adminProdStock" required>
+          </div>
+          <div class="form-group">
+            <label>Tipo:</label>
+            <select id="adminProdTipo" required>
+              <option value="estandar">Estándar</option>
+              <option value="impregnado">Impregnado</option>
+            </select>
+          </div>
+          <button type="submit" class="btn-primario">Crear Producto</button>
+          <button type="button" class="btn-secundario" onclick="cancelarFormProducto()">Cancelar</button>
+        </form>
+        <table class="admin-tabla">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Precio</th>
+              <th>Stock</th>
+              <th>Tipo</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="adminProductosTable"></tbody>
+        </table>
+      </div>
+
+      <!-- Tab: Pedidos -->
+      <div id="admin-pedidos" class="admin-tab-content" style="display:none;">
+        <h3>Gestionar Pedidos</h3>
+        <table class="admin-tabla">
+          <thead>
+            <tr>
+              <th>Número de Orden</th>
+              <th>Cliente</th>
+              <th>Total</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="adminPedidosTable"></tbody>
+        </table>
+      </div>
+
+      <!-- Tab: Usuarios -->
+      <div id="admin-usuarios" class="admin-tab-content" style="display:none;">
+        <h3>Gestionar Usuarios</h3>
+        <table class="admin-tabla">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Email</th>
+              <th>Rol</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="adminUsuariosTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal para detalles -->
+  <div id="modal" class="modal">
+    <div class="modal-contenido">
+      <span class="modal-cerrar" onclick="cerrarModal()">&times;</span>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- Script -->
+  <script src="src/js/app.js"></script>
+</body>
+</html>
