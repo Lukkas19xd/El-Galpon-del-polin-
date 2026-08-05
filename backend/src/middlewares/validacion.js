@@ -22,7 +22,14 @@ export const validarLogin = [
 ];
 
 export const validarItemCarrito = [
-    body('producto_id').isInt({ min: 1 }).withMessage('producto_id inválido.'),
+    body('productoId').notEmpty().withMessage('productoId es obligatorio.'),
     body('cantidad').isInt({ min: 1 }).withMessage('cantidad debe ser mayor a 0.'),
+    manejarValidacion
+];
+
+export const validarProducto = [
+    body('nombre').trim().notEmpty().withMessage('El nombre es obligatorio.'),
+    body('precio').isFloat({ min: 0 }).withMessage('El precio debe ser un número mayor o igual a 0.'),
+    body('stock').isInt({ min: 0 }).withMessage('El stock debe ser un número entero mayor o igual a 0.'),
     manejarValidacion
 ];

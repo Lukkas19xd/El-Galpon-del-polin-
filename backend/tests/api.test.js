@@ -1,5 +1,6 @@
 import request from 'supertest';
 import app from '../src/index.js';
+import Producto from '../src/models/Producto.js';
 
 describe('Rutas de Autenticación', () => {
   let token;
@@ -56,7 +57,8 @@ describe('Rutas de Autenticación', () => {
         confirmacion: 'password123'
       });
 
-    expect(res.statusCode).toBe(400);
+    // 409 Conflict es el código correcto para "el recurso ya existe"
+    expect(res.statusCode).toBe(409);
     expect(res.body.success).toBe(false);
   });
 });
@@ -78,8 +80,19 @@ describe('Rutas de Productos', () => {
 
     adminToken = regRes.body.token;
 
-    // Actualizar rol manualmente en la BD (en pruebas reales)
-    // Por ahora solo testeamos con el token obtenido
+    // Se crea un producto real directamente vía el modelo para poder
+    // probar /validar-stock contra un ID que sí existe en la base.
+    const producto = await Producto.create({
+      nombre: 'Producto Test Stock',
+      descripcion: 'Producto de prueba para test de validación de stock',
+      precio: 10,
+      stock: 20,
+      tipo: 'estandar',
+      categoria: 'test',
+      activo: true
+    });
+
+    productoId = producto.id;
   });
 
   test('GET /api/productos - Obtener todos los productos', async () => {
@@ -95,7 +108,7 @@ describe('Rutas de Productos', () => {
     const res = await request(app)
       .post('/api/productos/validar-stock')
       .send({
-        productoId: '507f1f77bcf86cd799439011',
+        productoId,
         cantidad: 5
       });
 

@@ -11,7 +11,11 @@ const getRefId = (ref) => {
 };
 
 const populatePedido = async (pedido) => {
-  const usuario = await Usuario.findById(getRefId(pedido.usuario));
+  const usuarioCompleto = await Usuario.findById(getRefId(pedido.usuario));
+  const usuarioSeguro = usuarioCompleto
+    ? (({ contrasena, ...resto }) => resto)(usuarioCompleto)
+    : pedido.usuario;
+
   const items = await Promise.all(
     (pedido.items || []).map(async (item) => {
       const producto = await Producto.findById(getRefId(item.producto));
@@ -24,7 +28,7 @@ const populatePedido = async (pedido) => {
 
   return {
     ...pedido,
-    usuario: usuario || pedido.usuario,
+    usuario: usuarioSeguro,
     items
   };
 };
