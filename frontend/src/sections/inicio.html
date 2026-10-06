@@ -1,0 +1,45 @@
+<section id="seccion-inicio">
+  <style>
+    /* Fondo de bosque armado con 3 capas de SVG en mosaico (sin imagen externa):
+       cada capa repite una silueta de pino con distinto tamaño/color para dar profundidad. */
+    .bosque-capa-fondo {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,10 80,55 20,55' fill='%233A7A4F'/%3E%3Cpolygon points='50,30 85,75 15,75' fill='%233A7A4F'/%3E%3Cpolygon points='50,50 100,100 0,100' fill='%233A7A4F'/%3E%3C/svg%3E");
+      background-repeat: repeat-x;
+      background-position: bottom;
+      background-size: 90px 100px;
+    }
+    .bosque-capa-medio {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 120'%3E%3Cpolygon points='50,0 82,50 18,50' fill='%232D5F3F'/%3E%3Cpolygon points='50,22 88,70 12,70' fill='%232D5F3F'/%3E%3Cpolygon points='50,45 100,120 0,120' fill='%232D5F3F'/%3E%3C/svg%3E");
+      background-repeat: repeat-x;
+      background-position: bottom;
+      background-size: 120px 140px;
+    }
+    .bosque-capa-frente {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140'%3E%3Cpolygon points='50,0 83,52 17,52' fill='%23163D27'/%3E%3Cpolygon points='50,24 90,78 10,78' fill='%23163D27'/%3E%3Cpolygon points='50,50 100,140 0,140' fill='%23163D27'/%3E%3C/svg%3E");
+      background-repeat: repeat-x;
+      background-position: bottom;
+      background-size: 150px 170px;
+    }
+  </style>
+
+  <div class="relative isolate overflow-hidden rounded-2xl shadow-2xl">
+    <!-- Cielo -->
+    <div class="absolute inset-0 bg-gradient-to-b from-bosque-noche via-bosque to-bosque-claro"></div>
+    <!-- Resplandor -->
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.2),transparent_60%)]"></div>
+    <!-- Capas de pinos (profundidad) -->
+    <div class="bosque-capa-fondo absolute inset-x-0 bottom-0 h-40 opacity-40"></div>
+    <div class="bosque-capa-medio absolute inset-x-0 bottom-0 h-52 opacity-65"></div>
+    <div class="bosque-capa-frente absolute inset-x-0 bottom-0 h-64 opacity-90"></div>
+    <!-- Oscurecedor para contraste del texto -->
+    <div class="absolute inset-0 bg-black/25"></div>
+
+    <!-- Contenido -->
+    <div class="relative px-6 py-24 text-center text-white sm:py-32">
+      <span class="mb-4 inline-block text-5xl drop-shadow-lg">🌲</span>
+      <h1 class="mb-4 text-4xl font-extrabold tracking-tight drop-shadow-lg sm:text-6xl">El Galpón del Polín</h1>
+      <p class="mx-auto mb-10 max-w-xl text-lg text-white/90 drop-shadow sm:text-xl">Venta especializada de polines de calidad industrial y estándar</p>
+      <button class="rounded-md bg-madera px-8 py-4 text-lg font-bold shadow-lg transition hover:-translate-y-0.5 hover:bg-madera-claro" onclick="cambiarVista('productos')">Ver Catálogo</button>
+    </div>
+  </div>
+</section>

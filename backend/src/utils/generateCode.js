@@ -1,4 +1,4 @@
-import { pedidosDB } from '../db.js';
+import Pedido from '../models/Pedido.js';
 
 export async function generarCodigoUnico() {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -10,7 +10,7 @@ export async function generarCodigoUnico() {
         for (let i = 0; i < 6; i++) {
             codigo += chars.charAt(Math.floor(Math.random() * chars.length));
         }
-        const encontrado = await pedidosDB.findOne({ numeroOrden: `RES-${codigo}` });
+        const encontrado = await Pedido.findOne({ numeroOrden: `RES-${codigo}` });
         existe = !!encontrado;
     }
 

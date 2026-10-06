@@ -4,7 +4,7 @@ import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import './db.js';
+import { connectDB } from './db.js';
 import { errorHandler } from './utils/errorHandler.js';
 import { logger } from './utils/logger.js';
 
@@ -26,12 +26,20 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || 'localhost';
 
-// La base de datos SQLite se conecta y crea el schema al importar './db.js' arriba
-logger.info('Base de datos conectada (SQLite)');
+await connectDB();
+logger.info('Base de datos conectada (PostgreSQL)');
 
 // Middlewares globales
+// "localhost" y "127.0.0.1" son orígenes distintos para el navegador aunque
+// apunten al mismo servidor, así que aceptamos ambos para evitar bloqueos CORS.
+const origenesPermitidos = [
+  process.env.FRONTEND_URL || 'http://localhost:8000',
+  'http://localhost:8000',
+  'http://127.0.0.1:8000'
+];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: [...new Set(origenesPermitidos)],
   credentials: true
 }));
 

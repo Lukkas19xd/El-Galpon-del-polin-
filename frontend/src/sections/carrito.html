@@ -1,0 +1,30 @@
+<section id="seccion-carrito" class="hidden">
+  <h2 class="mb-6 border-b-4 border-madera pb-4 text-2xl font-bold text-bosque">Carrito de Compras</h2>
+  <div id="carritoVacio" class="py-12 text-center text-neutral-400">
+    <p class="mb-4">Tu carrito está vacío</p>
+    <button class="rounded-md bg-madera px-6 py-3 font-bold text-white shadow hover:bg-madera-claro" onclick="cambiarVista('productos')">Continuar Comprando</button>
+  </div>
+  <div id="carritoContenido" style="display:none;">
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse">
+        <thead>
+          <tr class="bg-neutral-100 text-left text-sm font-bold text-neutral-700">
+            <th class="p-4">Producto</th>
+            <th class="p-4">Precio</th>
+            <th class="p-4">Cantidad</th>
+            <th class="p-4">Subtotal</th>
+            <th class="p-4">Acción</th>
+          </tr>
+        </thead>
+        <tbody id="carritoItems" class="divide-y divide-neutral-100"></tbody>
+      </table>
+    </div>
+    <div class="mt-6 border-t-2 border-madera pt-4 text-right">
+      <h3 class="text-2xl font-bold text-madera">Total: $<span id="carritoTotal">0</span></h3>
+    </div>
+    <div class="mt-6 flex justify-end gap-4">
+      <button class="rounded-md bg-neutral-600 px-6 py-3 font-bold text-white shadow hover:bg-neutral-700" onclick="cambiarVista('productos')">Seguir Comprando</button>
+      <button class="rounded-md bg-madera px-6 py-3 font-bold text-white shadow hover:bg-madera-claro" onclick="cambiarVista('checkout')">Finalizar Compra</button>
+    </div>
+  </div>
+</section>

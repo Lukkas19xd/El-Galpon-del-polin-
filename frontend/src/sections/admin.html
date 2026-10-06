@@ -1,0 +1,96 @@
+<section id="seccion-admin" class="hidden">
+  <h2 class="mb-6 border-b-4 border-madera pb-4 text-2xl font-bold text-bosque">Panel de Administrador</h2>
+  <div class="mb-8 flex gap-0 border-b-2 border-neutral-200">
+    <button class="tab-btn border-b-2 border-madera px-6 py-3 font-bold text-madera" onclick="cambiarTab('admin-productos')">Productos</button>
+    <button class="tab-btn border-b-2 border-transparent px-6 py-3 font-bold text-neutral-600 hover:bg-neutral-100" onclick="cambiarTab('admin-pedidos')">Pedidos</button>
+    <button class="tab-btn border-b-2 border-transparent px-6 py-3 font-bold text-neutral-600 hover:bg-neutral-100" onclick="cambiarTab('admin-usuarios')">Usuarios</button>
+  </div>
+
+  <!-- Tab: Productos -->
+  <div id="admin-productos" class="admin-tab-content rounded-md bg-neutral-50 p-6">
+    <h3 class="mb-4 text-lg font-bold text-bosque">Gestionar Productos</h3>
+    <button class="mb-4 rounded-md bg-madera px-6 py-2 font-bold text-white shadow hover:bg-madera-claro" onclick="mostrarFormNuevoProducto()">Nuevo Producto</button>
+    <form id="formNuevoProducto" class="hidden mb-6 space-y-4 rounded-md bg-white p-6 shadow" onsubmit="handleNuevoProducto(event)">
+      <div>
+        <label class="mb-1 block text-sm font-semibold text-neutral-700">Nombre:</label>
+        <input type="text" id="adminProdNombre" required class="w-full rounded-md border border-neutral-300 px-3 py-2">
+      </div>
+      <div>
+        <label class="mb-1 block text-sm font-semibold text-neutral-700">Descripción:</label>
+        <textarea id="adminProdDesc" required class="min-h-[6rem] w-full rounded-md border border-neutral-300 px-3 py-2"></textarea>
+      </div>
+      <div>
+        <label class="mb-1 block text-sm font-semibold text-neutral-700">Precio:</label>
+        <input type="number" id="adminProdPrecio" step="0.01" required class="w-full rounded-md border border-neutral-300 px-3 py-2">
+      </div>
+      <div>
+        <label class="mb-1 block text-sm font-semibold text-neutral-700">Stock:</label>
+        <input type="number" id="adminProdStock" required class="w-full rounded-md border border-neutral-300 px-3 py-2">
+      </div>
+      <div>
+        <label class="mb-1 block text-sm font-semibold text-neutral-700">Tipo:</label>
+        <select id="adminProdTipo" required class="w-full rounded-md border border-neutral-300 px-3 py-2">
+          <option value="estandar">Estándar</option>
+          <option value="impregnado">Impregnado</option>
+        </select>
+      </div>
+      <div class="flex gap-4">
+        <button type="submit" class="rounded-md bg-madera px-6 py-2 font-bold text-white shadow hover:bg-madera-claro">Crear Producto</button>
+        <button type="button" class="rounded-md bg-neutral-600 px-6 py-2 font-bold text-white shadow hover:bg-neutral-700" onclick="cancelarFormProducto()">Cancelar</button>
+      </div>
+    </form>
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse">
+        <thead>
+          <tr class="bg-bosque text-left text-sm font-bold text-white">
+            <th class="p-4">Nombre</th>
+            <th class="p-4">Precio</th>
+            <th class="p-4">Stock</th>
+            <th class="p-4">Tipo</th>
+            <th class="p-4">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="adminProductosTable" class="divide-y divide-neutral-200"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Tab: Pedidos -->
+  <div id="admin-pedidos" class="admin-tab-content hidden rounded-md bg-neutral-50 p-6">
+    <h3 class="mb-4 text-lg font-bold text-bosque">Gestionar Pedidos</h3>
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse">
+        <thead>
+          <tr class="bg-bosque text-left text-sm font-bold text-white">
+            <th class="p-4">Número de Orden</th>
+            <th class="p-4">Cliente</th>
+            <th class="p-4">Total</th>
+            <th class="p-4">Estado</th>
+            <th class="p-4">Fecha</th>
+            <th class="p-4">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="adminPedidosTable" class="divide-y divide-neutral-200"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Tab: Usuarios -->
+  <div id="admin-usuarios" class="admin-tab-content hidden rounded-md bg-neutral-50 p-6">
+    <h3 class="mb-4 text-lg font-bold text-bosque">Gestionar Usuarios</h3>
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse">
+        <thead>
+          <tr class="bg-bosque text-left text-sm font-bold text-white">
+            <th class="p-4">Nombre</th>
+            <th class="p-4">Email</th>
+            <th class="p-4">Rol</th>
+            <th class="p-4">Estado</th>
+            <th class="p-4">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="adminUsuariosTable" class="divide-y divide-neutral-200"></tbody>
+      </table>
+    </div>
+  </div>
+</section>

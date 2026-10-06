@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: polin
+      POSTGRES_PASSWORD: polin
+      POSTGRES_DB: el_galpon_del_polin
+    ports:
+      - "5433:5432"
+    volumes:
+      - polin_pgdata:/var/lib/postgresql/data
+
+volumes:
+  polin_pgdata:

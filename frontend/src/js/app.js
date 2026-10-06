@@ -11,6 +11,7 @@ const monedaCLP = new Intl.NumberFormat('es-CL', {
 
 // ============ INICIALIZACIÓN ============
 document.addEventListener('DOMContentLoaded', async () => {
+  await window.seccionesListas;
   actualizarEstadoAutenticacion();
   renderNavUser();
   cargarProductos();
@@ -122,22 +123,21 @@ function cerrarSesion() {
   actualizarEstadoAutenticacion();
   renderNavUser();
   cambiarVista('inicio');
+  cargarProductos();
   mostrarMensaje('Sesión cerrada', 'success');
 }
 
 // ============ NAVEGACIÓN ============
 function cambiarVista(vista) {
   // Ocultar todas las secciones
-  document.querySelectorAll('main > section').forEach(section => {
-    section.classList.remove('vista-activa');
-    section.style.display = 'none';
+  document.querySelectorAll('#main-content > section').forEach(section => {
+    section.classList.add('hidden');
   });
 
   // Mostrar la sección seleccionada
   const seccion = document.getElementById(`seccion-${vista}`);
   if (seccion) {
-    seccion.classList.add('vista-activa');
-    seccion.style.display = 'block';
+    seccion.classList.remove('hidden');
 
     // Cargar contenido específico
     if (vista === 'admin') {
@@ -188,12 +188,19 @@ function cambiarVista(vista) {
   }
 }
 
+const TAB_ACTIVO = ['border-madera', 'text-madera'];
+const TAB_INACTIVO = ['border-transparent', 'text-neutral-600', 'hover:bg-neutral-100'];
+
 function cambiarTab(tab) {
-  document.querySelectorAll('.admin-tab-content').forEach(el => el.style.display = 'none');
-  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-  
-  document.getElementById(tab).style.display = 'block';
-  event.target.classList.add('active');
+  document.querySelectorAll('.admin-tab-content').forEach(el => el.classList.add('hidden'));
+  document.querySelectorAll('.tab-btn').forEach(el => {
+    el.classList.remove(...TAB_ACTIVO);
+    el.classList.add(...TAB_INACTIVO);
+  });
+
+  document.getElementById(tab).classList.remove('hidden');
+  event.target.classList.remove(...TAB_INACTIVO);
+  event.target.classList.add(...TAB_ACTIVO);
 }
 
 // ============ AUTENTICACIÓN ============
@@ -225,6 +232,7 @@ async function handleLogin(event) {
     document.getElementById('formLogin').reset();
     mostrarMensaje('Login exitoso', 'success');
     cambiarVista('inicio');
+    cargarProductos();
   } catch (error) {
     mostrarError('loginError', error.message);
   }
@@ -260,6 +268,7 @@ async function handleRegistro(event) {
     document.getElementById('formRegistro').reset();
     mostrarMensaje('Registro exitoso', 'success');
     cambiarVista('inicio');
+    cargarProductos();
   } catch (error) {
     mostrarError('regError', error.message);
   }
@@ -295,21 +304,23 @@ async function cargarProductos() {
 
 function crearTarjetaProducto(producto) {
   const card = document.createElement('div');
-  card.className = 'producto-card';
+  card.className = 'overflow-hidden rounded-lg border-l-4 border-madera bg-white shadow-md transition hover:-translate-y-1 hover:shadow-xl';
   card.innerHTML = `
-    <div class="producto-header">
-      <h3>${producto.nombre}</h3>
-      <span class="producto-tipo">${producto.tipo === 'impregnado' ? 'Impregnado' : 'Estándar'}</span>
+    <div class="bg-gradient-to-br from-bosque to-bosque-claro p-4 text-white">
+      <h3 class="text-lg font-bold">${producto.nombre}</h3>
+      <span class="mt-2 inline-block rounded-full bg-madera px-3 py-1 text-xs">${producto.tipo === 'impregnado' ? 'Impregnado' : 'Estándar'}</span>
     </div>
-    <div class="producto-body">
-      <p class="producto-descripcion">${producto.descripcion.substring(0, 100)}...</p>
-      <div class="producto-info">
-        <span class="producto-precio">$${producto.precio.toFixed(2)}</span>
-        <span class="producto-stock">Stock: ${producto.stock}</span>
+    <div class="p-4">
+      <p class="mb-4 text-sm text-neutral-600">${producto.descripcion.substring(0, 100)}...</p>
+      <div class="mb-4 flex items-center justify-between border-y border-neutral-100 py-3">
+        <span class="text-xl font-bold text-madera">$${producto.precio.toFixed(2)}</span>
+        <span class="text-sm text-neutral-500">Stock: ${producto.stock}</span>
       </div>
-      <div class="producto-acciones">
-        <input type="number" id="cantidad-${producto._id}" min="1" max="${producto.stock}" value="1">
-        ${tokenActual ? `<button onclick="agregarAlCarrito('${producto._id}')">Agregar</button>` : `<button onclick="cambiarVista('login')">Comprar</button>`}
+      <div class="flex gap-2">
+        <input type="number" id="cantidad-${producto._id}" min="1" max="${producto.stock}" value="1" class="w-16 rounded-md border border-neutral-300 px-2 py-2 text-center">
+        ${tokenActual
+          ? `<button class="flex-1 rounded-md bg-bosque px-2 py-2 font-bold text-white hover:bg-bosque-claro" onclick="agregarAlCarrito('${producto._id}')">Agregar</button>`
+          : `<button class="flex-1 rounded-md bg-bosque px-2 py-2 font-bold text-white hover:bg-bosque-claro" onclick="cambiarVista('login')">Comprar</button>`}
       </div>
     </div>
   `;
@@ -386,15 +397,15 @@ async function cargarCarrito() {
       carrito.items.forEach(item => {
         html += `
           <tr>
-            <td>${item.producto.nombre}</td>
-            <td>$${item.precio.toFixed(2)}</td>
-            <td>
-              <input type="number" min="1" value="${item.cantidad}" 
+            <td class="p-4">${item.producto.nombre}</td>
+            <td class="p-4">$${item.precio.toFixed(2)}</td>
+            <td class="p-4">
+              <input type="number" min="1" value="${item.cantidad}" class="w-20 rounded-md border border-neutral-300 px-2 py-1"
                 onchange="actualizarCantidadCarrito('${item.producto._id}', this.value)">
             </td>
-            <td>$${(item.cantidad * item.precio).toFixed(2)}</td>
-            <td>
-              <button class="btn-eliminar btn-pequeno" 
+            <td class="p-4">$${(item.cantidad * item.precio).toFixed(2)}</td>
+            <td class="p-4">
+              <button class="rounded-md bg-red-600 px-3 py-1 text-sm font-bold text-white hover:opacity-80"
                 onclick="eliminarDelCarrito('${item.producto._id}')">Eliminar</button>
             </td>
           </tr>
@@ -476,11 +487,11 @@ async function cargarResumenPedido() {
     }));
     localStorage.setItem('carrito', JSON.stringify(carritoLocal));
 
-    let html = '<ul>';
+    let html = '<ul class="divide-y divide-neutral-200">';
     carrito.items.forEach(item => {
-      html += `<li>${item.producto.nombre} (x${item.cantidad}): $${(item.cantidad * item.precio).toFixed(2)}</li>`;
+      html += `<li class="py-2 text-sm">${item.producto.nombre} (x${item.cantidad}): $${(item.cantidad * item.precio).toFixed(2)}</li>`;
     });
-    html += `</ul><hr><p><strong>Total: $${carrito.total.toFixed(2)}</strong></p>`;
+    html += `<li class="pt-4 text-lg font-bold text-madera">Total: $${carrito.total.toFixed(2)}</li></ul>`;
 
     document.getElementById('resumenPedido').innerHTML = html;
   } catch (error) {
@@ -605,14 +616,18 @@ async function cargarMisPedidos() {
     if (pedidos.length === 0) {
       html = '<p>No tienes pedidos realizados</p>';
     } else {
-      html = '<table class="carrito-tabla"><thead><tr><th>Orden</th><th>Total</th><th>Estado</th><th>Fecha</th></tr></thead><tbody>';
+      html = `<table class="w-full border-collapse">
+        <thead><tr class="bg-neutral-100 text-left text-sm font-bold text-neutral-700">
+          <th class="p-4">Orden</th><th class="p-4">Total</th><th class="p-4">Estado</th><th class="p-4">Fecha</th>
+        </tr></thead>
+        <tbody class="divide-y divide-neutral-100">`;
       pedidos.forEach(pedido => {
         const fecha = new Date(pedido.createdAt).toLocaleDateString('es-CL');
         html += `<tr>
-          <td>${pedido.numeroOrden}</td>
-          <td>${monedaCLP.format(pedido.total)}</td>
-          <td>${pedido.estado}</td>
-          <td>${fecha}</td>
+          <td class="p-4">${pedido.numeroOrden}</td>
+          <td class="p-4">${monedaCLP.format(pedido.total)}</td>
+          <td class="p-4">${pedido.estado}</td>
+          <td class="p-4">${fecha}</td>
         </tr>`;
       });
       html += '</tbody></table>';
@@ -640,30 +655,20 @@ async function cargarDashboard() {
       return acc;
     }, { total: 0 });
 
-    const html = `
-      <div class="dashboard-grid">
-        <div class="dashboard-card">
-          <h3>Pedidos totales</h3>
-          <p>${pedidos.length}</p>
-        </div>
-        <div class="dashboard-card">
-          <h3>Total pagado</h3>
-          <p>${monedaCLP.format(totales.total)}</p>
-        </div>
-        <div class="dashboard-card">
-          <h3>Pendientes</h3>
-          <p>${totales.pendiente || 0}</p>
-        </div>
-        <div class="dashboard-card">
-          <h3>Entregados</h3>
-          <p>${totales.entregado || 0}</p>
-        </div>
-        <div class="dashboard-card">
-          <h3>Cancelados</h3>
-          <p>${totales.cancelado || 0}</p>
-        </div>
+    const tarjeta = (titulo, valor) => `
+      <div class="rounded-md bg-white p-6 text-center shadow">
+        <h3 class="mb-2 text-sm font-semibold text-neutral-500">${titulo}</h3>
+        <p class="text-2xl font-bold text-bosque">${valor}</p>
       </div>
     `;
+
+    const html = [
+      tarjeta('Pedidos totales', pedidos.length),
+      tarjeta('Total pagado', monedaCLP.format(totales.total)),
+      tarjeta('Pendientes', totales.pendiente || 0),
+      tarjeta('Entregados', totales.entregado || 0),
+      tarjeta('Cancelados', totales.cancelado || 0)
+    ].join('');
 
     document.getElementById('dashboardStats').innerHTML = html;
   } catch (error) {
@@ -696,8 +701,8 @@ async function buscarReservaPorCodigo() {
     const pedido = data.pedido;
     const fecha = new Date(pedido.createdAt).toLocaleDateString('es-CL');
     const resultado = `
-      <div class="busqueda-reserva">
-        <h3>Reserva encontrada</h3>
+      <div class="space-y-2 rounded-md bg-white p-6 shadow">
+        <h3 class="mb-2 text-lg font-bold text-bosque">Reserva encontrada</h3>
         <p><strong>Código:</strong> ${pedido.numeroOrden}</p>
         <p><strong>Total:</strong> ${monedaCLP.format(pedido.total)}</p>
         <p><strong>Estado:</strong> ${pedido.estado}</p>
@@ -727,13 +732,13 @@ async function cargarProductosAdmin() {
     let html = '';
     productos.forEach(producto => {
       html += `<tr>
-        <td>${producto.nombre}</td>
-        <td>$${producto.precio.toFixed(2)}</td>
-        <td>${producto.stock}</td>
-        <td>${producto.tipo}</td>
-        <td>
-          <button class="btn-editar" onclick="editarProducto('${producto._id}')">Editar</button>
-          <button class="btn-eliminar" onclick="eliminarProductoAdmin('${producto._id}')">Eliminar</button>
+        <td class="p-4">${producto.nombre}</td>
+        <td class="p-4">$${producto.precio.toFixed(2)}</td>
+        <td class="p-4">${producto.stock}</td>
+        <td class="p-4">${producto.tipo}</td>
+        <td class="p-4 space-x-2">
+          <button class="rounded-md bg-blue-600 px-3 py-1 text-sm font-bold text-white hover:opacity-80" onclick="editarProducto('${producto._id}')">Editar</button>
+          <button class="rounded-md bg-red-600 px-3 py-1 text-sm font-bold text-white hover:opacity-80" onclick="eliminarProductoAdmin('${producto._id}')">Eliminar</button>
         </td>
       </tr>`;
     });
@@ -825,13 +830,13 @@ async function cargarPedidosAdmin() {
     pedidos.forEach(pedido => {
       const fecha = new Date(pedido.createdAt).toLocaleDateString('es-CL');
       html += `<tr>
-        <td>${pedido.numeroOrden}</td>
-        <td>${pedido.usuario.nombre}</td>
-        <td>${monedaCLP.format(pedido.total)}</td>
-        <td>${pedido.estado}</td>
-        <td>${fecha}</td>
-        <td>
-          <button class="btn-editar" onclick="abrirDetallesPedido('${pedido._id}')">Ver Detalles</button>
+        <td class="p-4">${pedido.numeroOrden}</td>
+        <td class="p-4">${pedido.usuario.nombre}</td>
+        <td class="p-4">${monedaCLP.format(pedido.total)}</td>
+        <td class="p-4">${pedido.estado}</td>
+        <td class="p-4">${fecha}</td>
+        <td class="p-4">
+          <button class="rounded-md bg-blue-600 px-3 py-1 text-sm font-bold text-white hover:opacity-80" onclick="abrirDetallesPedido('${pedido._id}')">Ver Detalles</button>
         </td>
       </tr>`;
     });
@@ -856,12 +861,12 @@ async function cargarUsuarios() {
     let html = '';
     usuarios.forEach(usuario => {
       html += `<tr>
-        <td>${usuario.nombre}</td>
-        <td>${usuario.email}</td>
-        <td>${usuario.rol}</td>
-        <td>${usuario.activo ? 'Activo' : 'Inactivo'}</td>
-        <td>
-          <button class="btn-editar" onclick="editarUsuario('${usuario._id}')">Editar</button>
+        <td class="p-4">${usuario.nombre}</td>
+        <td class="p-4">${usuario.email}</td>
+        <td class="p-4">${usuario.rol}</td>
+        <td class="p-4">${usuario.activo ? 'Activo' : 'Inactivo'}</td>
+        <td class="p-4">
+          <button class="rounded-md bg-blue-600 px-3 py-1 text-sm font-bold text-white hover:opacity-80" onclick="editarUsuario('${usuario._id}')">Editar</button>
         </td>
       </tr>`;
     });
@@ -884,19 +889,19 @@ async function abrirDetallesPedido(pedidoId) {
     const pedido = data.pedido;
 
     let html = `
-      <h3>Pedido: ${pedido.numeroOrden}</h3>
-      <p><strong>Cliente:</strong> ${pedido.usuario.nombre}</p>
-      <p><strong>Total:</strong> $${pedido.total.toFixed(2)}</p>
-      <p><strong>Estado actual:</strong> ${pedido.estado}</p>
-      <h4>Cambiar Estado:</h4>
-      <select id="nuevoEstado">
+      <h3 class="mb-3 text-lg font-bold text-bosque">Pedido: ${pedido.numeroOrden}</h3>
+      <p class="mb-1"><strong>Cliente:</strong> ${pedido.usuario.nombre}</p>
+      <p class="mb-1"><strong>Total:</strong> $${pedido.total.toFixed(2)}</p>
+      <p class="mb-4"><strong>Estado actual:</strong> ${pedido.estado}</p>
+      <h4 class="mb-2 font-semibold text-neutral-700">Cambiar Estado:</h4>
+      <select id="nuevoEstado" class="mb-4 w-full rounded-md border border-neutral-300 px-3 py-2">
         <option value="pendiente">Pendiente</option>
         <option value="confirmado">Confirmado</option>
         <option value="enviado">Enviado</option>
         <option value="entregado">Entregado</option>
         <option value="cancelado">Cancelado</option>
       </select>
-      <button class="btn-primario" onclick="actualizarEstadoPedido('${pedidoId}')">Actualizar</button>
+      <button class="w-full rounded-md bg-madera px-6 py-3 font-bold text-white shadow hover:bg-madera-claro" onclick="actualizarEstadoPedido('${pedidoId}')">Actualizar</button>
     `;
 
     document.getElementById('modalBody').innerHTML = html;
@@ -934,26 +939,25 @@ async function actualizarEstadoPedido(pedidoId) {
 
 // ============ UTILIDADES ============
 function abrirModal() {
-  document.getElementById('modal').classList.add('show');
+  document.getElementById('modal').classList.remove('hidden');
 }
 
 function cerrarModal() {
-  document.getElementById('modal').classList.remove('show');
+  document.getElementById('modal').classList.add('hidden');
 }
 
+const ESTILOS_MENSAJE = {
+  success: 'bg-green-50 text-green-700 border border-green-200',
+  error: 'bg-red-50 text-red-700 border border-red-200',
+  warning: 'bg-amber-50 text-amber-700 border border-amber-200',
+  info: 'bg-blue-50 text-blue-700 border border-blue-200'
+};
+
 function mostrarMensaje(mensaje, tipo = 'info') {
-  const mainContent = document.querySelector('.main-content');
   const div = document.createElement('div');
-  div.className = `${tipo}-message`;
+  div.className = `fixed top-20 right-5 z-[200] max-w-xs rounded-md px-4 py-3 text-sm font-medium shadow-lg ${ESTILOS_MENSAJE[tipo] || ESTILOS_MENSAJE.info}`;
   div.textContent = mensaje;
-  div.style.position = 'fixed';
-  div.style.top = '80px';
-  div.style.right = '20px';
-  div.style.zIndex = '9999';
-  div.style.padding = '1rem';
-  div.style.borderRadius = '4px';
-  div.style.maxWidth = '300px';
-  mainContent.appendChild(div);
+  document.body.appendChild(div);
 
   setTimeout(() => div.remove(), 3000);
 }
@@ -961,8 +965,8 @@ function mostrarMensaje(mensaje, tipo = 'info') {
 function mostrarError(elementId, mensaje) {
   const errorDiv = document.getElementById(elementId);
   errorDiv.textContent = mensaje;
-  errorDiv.classList.add('show');
-  setTimeout(() => errorDiv.classList.remove('show'), 3000);
+  errorDiv.classList.remove('hidden');
+  setTimeout(() => errorDiv.classList.add('hidden'), 3000);
 }
 
 // Cerrar modal al hacer clic afuera

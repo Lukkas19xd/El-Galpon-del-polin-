@@ -32,7 +32,8 @@ export const registroUsuario = asyncHandler(async (req, res) => {
     nombre,
     email,
     contrasena: hashedPassword,
-    rol: 'cliente'
+    rol: 'cliente',
+    activo: true
   });
 
   const token = generarToken(usuario._id, usuario.rol);

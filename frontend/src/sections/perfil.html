@@ -1,0 +1,35 @@
+<section id="seccion-perfil" class="hidden">
+  <h2 class="mb-6 border-b-4 border-madera pb-4 text-2xl font-bold text-bosque">Mi Perfil</h2>
+  <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+    <div class="rounded-md bg-neutral-50 p-6">
+      <h3 class="mb-4 text-lg font-bold text-bosque">Información Personal</h3>
+      <form id="formPerfil" onsubmit="handleActualizarPerfil(event)" class="space-y-5">
+        <div>
+          <label class="mb-1 block text-sm font-semibold text-neutral-700">Nombre:</label>
+          <input type="text" id="perfilNombre" class="w-full rounded-md border border-neutral-300 px-3 py-2">
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-semibold text-neutral-700">Email:</label>
+          <input type="email" id="perfilEmail" disabled class="w-full rounded-md border border-neutral-200 bg-neutral-100 px-3 py-2 text-neutral-500">
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-semibold text-neutral-700">Teléfono:</label>
+          <input type="tel" id="perfilTelefono" class="w-full rounded-md border border-neutral-300 px-3 py-2">
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-semibold text-neutral-700">Dirección:</label>
+          <input type="text" id="perfilDireccion" class="w-full rounded-md border border-neutral-300 px-3 py-2">
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-semibold text-neutral-700">Ciudad:</label>
+          <input type="text" id="perfilCiudad" class="w-full rounded-md border border-neutral-300 px-3 py-2">
+        </div>
+        <button type="submit" class="w-full rounded-md bg-madera px-6 py-3 font-bold text-white shadow hover:bg-madera-claro">Guardar Cambios</button>
+      </form>
+    </div>
+    <div class="rounded-md bg-neutral-50 p-6">
+      <h3 class="mb-4 text-lg font-bold text-bosque">Mis Pedidos</h3>
+      <div id="misPedidos"></div>
+    </div>
+  </div>
+</section>

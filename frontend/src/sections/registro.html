@@ -1,0 +1,28 @@
+<section id="seccion-registro" class="hidden">
+  <div class="flex min-h-[28rem] items-center justify-center">
+    <div class="w-full max-w-sm rounded-lg border-t-4 border-bosque bg-white p-8 shadow-md">
+      <h2 class="mb-6 text-2xl font-bold text-bosque">Crear Cuenta</h2>
+      <form id="formRegistro" onsubmit="handleRegistro(event)" class="space-y-5">
+        <div>
+          <label for="regNombre" class="mb-1 block text-sm font-semibold text-neutral-700">Nombre:</label>
+          <input type="text" id="regNombre" required class="w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-bosque focus:outline-none focus:ring-2 focus:ring-bosque/20">
+        </div>
+        <div>
+          <label for="regEmail" class="mb-1 block text-sm font-semibold text-neutral-700">Email:</label>
+          <input type="email" id="regEmail" required class="w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-bosque focus:outline-none focus:ring-2 focus:ring-bosque/20">
+        </div>
+        <div>
+          <label for="regPassword" class="mb-1 block text-sm font-semibold text-neutral-700">Contraseña:</label>
+          <input type="password" id="regPassword" required class="w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-bosque focus:outline-none focus:ring-2 focus:ring-bosque/20">
+        </div>
+        <div>
+          <label for="regConfirm" class="mb-1 block text-sm font-semibold text-neutral-700">Confirmar Contraseña:</label>
+          <input type="password" id="regConfirm" required class="w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-bosque focus:outline-none focus:ring-2 focus:ring-bosque/20">
+        </div>
+        <button type="submit" class="w-full rounded-md bg-madera px-6 py-3 font-bold text-white shadow transition hover:-translate-y-0.5 hover:bg-madera-claro">Registrarse</button>
+        <p class="text-center text-sm">¿Ya tienes cuenta? <a href="#" onclick="cambiarVista('login')" class="font-bold text-madera">Iniciar Sesión</a></p>
+      </form>
+      <div id="regError" class="error-message hidden mt-4 rounded-md bg-red-50 px-4 py-3 text-sm font-semibold text-red-700"></div>
+    </div>
+  </div>
+</section>

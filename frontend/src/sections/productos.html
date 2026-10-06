@@ -1,0 +1,19 @@
+<section id="seccion-productos" class="hidden">
+  <h2 class="mb-6 border-b-4 border-madera pb-4 text-2xl font-bold text-bosque">Catálogo de Productos</h2>
+  <div class="mb-8 flex flex-wrap gap-4">
+    <select id="filtroTipo" onchange="aplicarFiltros()" class="rounded-md border border-neutral-300 px-4 py-2">
+      <option value="">Todos los tipos</option>
+      <option value="impregnado">Impregnado</option>
+      <option value="estandar">Estándar</option>
+    </select>
+    <select id="filtroCategoria" onchange="aplicarFiltros()" class="rounded-md border border-neutral-300 px-4 py-2">
+      <option value="">Todas las categorías</option>
+      <option value="industrial">Industrial</option>
+      <option value="construccion">Construcción</option>
+      <option value="agricola">Agrícola</option>
+    </select>
+  </div>
+  <div id="productosGrid" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <!-- Los productos se cargarán aquí -->
+  </div>
+</section>

@@ -27,6 +27,13 @@ export const validarItemCarrito = [
     manejarValidacion
 ];
 
+// En /actualizar, cantidad 0 es válida: significa quitar el producto del carrito.
+export const validarActualizarCarrito = [
+    body('productoId').notEmpty().withMessage('productoId es obligatorio.'),
+    body('cantidad').isInt({ min: 0 }).withMessage('cantidad debe ser mayor o igual a 0.'),
+    manejarValidacion
+];
+
 export const validarProducto = [
     body('nombre').trim().notEmpty().withMessage('El nombre es obligatorio.'),
     body('precio').isFloat({ min: 0 }).withMessage('El precio debe ser un número mayor o igual a 0.'),
