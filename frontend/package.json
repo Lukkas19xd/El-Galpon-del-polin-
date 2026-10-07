@@ -7,7 +7,7 @@
     "dev": "npm run css:watch & python3 -m http.server 8000 --directory . --bind 127.0.0.1",
     "css": "tailwindcss -i src/css/entrada.css -o src/css/estilos.css --minify",
     "css:watch": "tailwindcss -i src/css/entrada.css -o src/css/estilos.css --watch",
-    "start": "python3 -m http.server 3000 --directory . --bind 127.0.0.1"
+    "start": "python3 -m http.server 8000 --directory . --bind 127.0.0.1"
   },
   "keywords": [
     "polines",
