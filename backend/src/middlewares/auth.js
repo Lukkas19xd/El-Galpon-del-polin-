@@ -1,28 +1,36 @@
 import jwt from 'jsonwebtoken';
-import { ApiError } from '../utils/errorHandler.js';
+import Usuario from '../models/Usuario.js';
 
-export const verificarToken = (req, res, next) => {
+const noAutorizado = (res, message) => res.status(401).json({ success: false, statusCode: 401, message });
+
+// Valida el token y además consulta la base: así una cuenta desactivada o con
+// el rol cambiado deja de tener acceso al instante, sin esperar a que expire el token.
+export const verificarToken = async (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
 
   if (!token) {
-    return res.status(401).json({
-      success: false,
-      message: 'No hay token de autenticación'
-    });
+    return noAutorizado(res, 'No hay token de autenticación');
+  }
+
+  let decodificado;
+  try {
+    decodificado = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (error) {
+    return noAutorizado(res, 'Token inválido o expirado');
   }
 
   try {
-    const decodificado = jwt.verify(token, process.env.JWT_SECRET);
-    req.usuario = {
-      id: decodificado.id,
-      rol: decodificado.rol
-    };
+    const usuario = await Usuario.obtenerEstadoSesion(decodificado.id);
+    if (!usuario) {
+      return noAutorizado(res, 'La cuenta ya no existe');
+    }
+    if (!usuario.activo) {
+      return res.status(403).json({ success: false, statusCode: 403, message: 'Tu cuenta ha sido desactivada' });
+    }
+    req.usuario = { id: usuario.id, rol: usuario.rol };
     next();
   } catch (error) {
-    return res.status(401).json({
-      success: false,
-      message: 'Token inválido o expirado'
-    });
+    next(error);
   }
 };
 

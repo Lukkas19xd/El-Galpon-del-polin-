@@ -27,6 +27,12 @@ const mapRow = (row) => {
     );
     return mapRow(rows[0]);
   };
+  // Al serializar a JSON (respuestas de la API) nunca va el hash de la contraseña.
+  // Es enumerable a propósito: si alguien hace {...usuario}, la copia también lo filtra.
+  usuario.toJSON = function () {
+    const { contrasena, save, toJSON, ...publico } = this;
+    return publico;
+  };
   return usuario;
 };
 
@@ -54,6 +60,18 @@ const Usuario = {
     if (!id) return null;
     const { rows } = await pool.query('SELECT * FROM usuarios WHERE id = $1', [id]);
     return mapRow(rows[0]);
+  },
+
+  async findByIds(ids = []) {
+    if (ids.length === 0) return [];
+    const { rows } = await pool.query('SELECT * FROM usuarios WHERE id = ANY($1::uuid[])', [ids]);
+    return rows.map(mapRow);
+  },
+
+  // Lo mínimo para validar una sesión en cada petición
+  async obtenerEstadoSesion(id) {
+    const { rows } = await pool.query('SELECT id, rol, activo FROM usuarios WHERE id = $1', [id]);
+    return rows[0] || null;
   },
 
   async create({ nombre, email, contrasena, rol = 'cliente', activo = true, telefono, direccion, ciudad }) {

@@ -11,19 +11,11 @@ const generarToken = (id, rol) => {
 
 // Registro de usuario
 export const registroUsuario = asyncHandler(async (req, res) => {
-  const { nombre, email, contrasena, confirmacion } = req.body;
-
-  if (contrasena !== confirmacion) {
-    throw new ApiError('Las contraseñas no coinciden', 400);
-  }
+  const { nombre, email, contrasena, telefono } = req.body;
 
   let usuario = await Usuario.findOne({ email });
   if (usuario) {
     throw new ApiError('El email ya está registrado', 409);
-  }
-
-  if (contrasena.length < 6) {
-    throw new ApiError('La contraseña debe tener al menos 6 caracteres', 400);
   }
 
   const hashedPassword = await bcryptjs.hash(contrasena, await bcryptjs.genSalt(10));
@@ -33,7 +25,8 @@ export const registroUsuario = asyncHandler(async (req, res) => {
     email,
     contrasena: hashedPassword,
     rol: 'cliente',
-    activo: true
+    activo: true,
+    telefono: telefono || null
   });
 
   const token = generarToken(usuario._id, usuario.rol);
@@ -54,10 +47,6 @@ export const registroUsuario = asyncHandler(async (req, res) => {
 // Login de usuario
 export const loginUsuario = asyncHandler(async (req, res) => {
   const { email, contrasena } = req.body;
-
-  if (!email || !contrasena) {
-    throw new ApiError('Por favor ingresa email y contraseña', 400);
-  }
 
   const usuario = await Usuario.findOne({ email });
 
@@ -108,11 +97,7 @@ export const obtenerPerfil = asyncHandler(async (req, res) => {
 export const actualizarPerfil = asyncHandler(async (req, res) => {
   const { nombre, telefono, direccion, ciudad } = req.body;
 
-  const usuario = await Usuario.findByIdAndUpdate(
-    req.usuario.id,
-    { nombre, telefono, direccion, ciudad, updatedAt: Date.now() },
-    { new: true, runValidators: true }
-  );
+  const usuario = await Usuario.findByIdAndUpdate(req.usuario.id, { nombre, telefono, direccion, ciudad });
 
   if (!usuario) {
     throw new ApiError('Usuario no encontrado', 404);
@@ -132,17 +117,35 @@ export const obtenerUsuarios = asyncHandler(async (req, res) => {
   res.status(200).json({
     success: true,
     total: usuarios.length,
-    usuarios: usuarios.map(({ contrasena, ...rest }) => rest)
+    usuarios
+  });
+});
+
+// Cambiar rol o activar/desactivar una cuenta (solo admin)
+export const actualizarUsuario = asyncHandler(async (req, res) => {
+  const { rol, activo } = req.body;
+
+  // Evita que el admin se quite el acceso a sí mismo por error
+  if (req.params.id === req.usuario.id && (rol === 'cliente' || activo === false)) {
+    throw new ApiError('No puedes quitarte el rol de administrador ni desactivar tu propia cuenta', 400);
+  }
+
+  const usuario = await Usuario.findByIdAndUpdate(req.params.id, { rol, activo });
+
+  if (!usuario) {
+    throw new ApiError('Usuario no encontrado', 404);
+  }
+
+  res.status(200).json({
+    success: true,
+    message: 'Usuario actualizado',
+    usuario
   });
 });
 
 // Cambiar contraseña
 export const cambiarContrasena = asyncHandler(async (req, res) => {
-  const { contrasenaActual, contrasenanueva, confirmacion } = req.body;
-
-  if (contrasenanueva !== confirmacion) {
-    throw new ApiError('Las contraseñas no coinciden', 400);
-  }
+  const { contrasenaActual, contrasenanueva } = req.body;
 
   const usuario = await Usuario.findById(req.usuario.id);
 
@@ -157,10 +160,10 @@ export const cambiarContrasena = asyncHandler(async (req, res) => {
   }
 
   const hashedPassword = await bcryptjs.hash(contrasenanueva, await bcryptjs.genSalt(10));
-  await Usuario.findByIdAndUpdate(req.usuario.id, { contrasena: hashedPassword, updatedAt: Date.now() });
+  await Usuario.findByIdAndUpdate(req.usuario.id, { contrasena: hashedPassword });
 
   res.status(200).json({
     success: true,
-    message: 'Contraseña cambiadaexitosamente'
+    message: 'Contraseña cambiada exitosamente'
   });
 });

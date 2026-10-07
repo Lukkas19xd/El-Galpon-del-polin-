@@ -7,20 +7,18 @@ const resolveProductoId = (producto) => {
   return typeof producto === 'string' ? producto : producto.id || producto._id;
 };
 
+// Reemplaza los ids por los productos, con una sola consulta para todo el carrito
 const populateCarrito = async (carrito) => {
-  const items = await Promise.all(
-    (carrito.items || []).map(async (item) => {
-      const producto = await Producto.findById(resolveProductoId(item.producto));
-      return {
-        ...item,
-        producto: producto || item.producto
-      };
-    })
-  );
+  const items = carrito.items || [];
+  const productos = await Producto.findByIds(items.map((item) => resolveProductoId(item.producto)));
+  const productoPorId = new Map(productos.map((p) => [p.id, p]));
 
   return {
     ...carrito,
-    items
+    items: items.map((item) => ({
+      ...item,
+      producto: productoPorId.get(resolveProductoId(item.producto)) || item.producto
+    }))
   };
 };
 
@@ -44,18 +42,10 @@ export const obtenerCarrito = asyncHandler(async (req, res) => {
 export const agregarAlCarrito = asyncHandler(async (req, res) => {
   const { productoId, cantidad } = req.body;
 
-  if (cantidad < 1) {
-    throw new ApiError('La cantidad debe ser mayor a 0', 400);
-  }
-
   const producto = await Producto.findById(productoId);
 
-  if (!producto) {
+  if (!producto || !producto.activo) {
     throw new ApiError('Producto no encontrado', 404);
-  }
-
-  if (producto.stock < cantidad) {
-    throw new ApiError(`Stock insuficiente. Disponible: ${producto.stock}`, 400);
   }
 
   let carrito = await Carrito.findOne({ usuario: req.usuario.id });
@@ -65,9 +55,16 @@ export const agregarAlCarrito = asyncHandler(async (req, res) => {
   }
 
   const itemExistente = carrito.items.findIndex(item => resolveProductoId(item.producto) === productoId);
+  const cantidadTotal = cantidad + (itemExistente > -1 ? carrito.items[itemExistente].cantidad : 0);
+
+  // Se compara contra lo que ya había en el carrito más lo nuevo. El stock se
+  // reserva de verdad recién al confirmar la reserva (ver Pedido.crearDesdeCarrito).
+  if (producto.stock < cantidadTotal) {
+    throw new ApiError(`Stock insuficiente. Disponible: ${producto.stock}`, 409);
+  }
 
   if (itemExistente > -1) {
-    carrito.items[itemExistente].cantidad += cantidad;
+    carrito.items[itemExistente].cantidad = cantidadTotal;
   } else {
     carrito.items.push({
       producto: productoId,
@@ -113,10 +110,6 @@ export const eliminarDelCarrito = asyncHandler(async (req, res) => {
 export const actualizarCarrito = asyncHandler(async (req, res) => {
   const { productoId, cantidad } = req.body;
 
-  if (cantidad < 0) {
-    throw new ApiError('La cantidad no puede ser negativa', 400);
-  }
-
   const carrito = await Carrito.findOne({ usuario: req.usuario.id });
 
   if (!carrito) {
@@ -134,7 +127,7 @@ export const actualizarCarrito = asyncHandler(async (req, res) => {
   } else {
     const producto = await Producto.findById(productoId);
     if (!producto || producto.stock < cantidad) {
-      throw new ApiError(`Stock insuficiente. Disponible: ${producto ? producto.stock : 0}`, 400);
+      throw new ApiError(`Stock insuficiente. Disponible: ${producto ? producto.stock : 0}`, 409);
     }
     item.cantidad = cantidad;
   }

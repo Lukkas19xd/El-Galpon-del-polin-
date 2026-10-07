@@ -1,4 +1,6 @@
 import { pool } from '../config/database.js';
+import { ApiError } from '../utils/errorHandler.js';
+import { TRANSICIONES_ESTADO } from '../utils/constantes.js';
 
 const mapItemRow = (row) => ({
   producto: row.producto_id,
@@ -7,17 +9,9 @@ const mapItemRow = (row) => ({
   subtotal: row.subtotal
 });
 
-const cargarItems = async (pedidoId) => {
-  const { rows } = await pool.query(
-    'SELECT * FROM pedido_items WHERE pedido_id = $1 ORDER BY id ASC',
-    [pedidoId]
-  );
-  return rows.map(mapItemRow);
-};
-
-const buildPedido = (row, items) => {
+const mapPedido = (row, items = []) => {
   if (!row) return null;
-  const pedido = {
+  return {
     id: row.id,
     _id: row.id,
     numeroOrden: row.numero_orden,
@@ -27,74 +21,162 @@ const buildPedido = (row, items) => {
     metodoPago: row.metodo_pago,
     direccionEntrega: row.direccion_entrega,
     fechaRetiro: row.fecha_retiro,
+    nota: row.nota,
     historialEstados: row.historial_estados,
     items,
     createdAt: row.created_at,
     updatedAt: row.updated_at
   };
+};
 
-  pedido.save = async function () {
-    const { rows } = await pool.query(
-      `UPDATE pedidos
-         SET estado = $1, total = $2, metodo_pago = $3, direccion_entrega = $4,
-             fecha_retiro = $5, historial_estados = $6, updated_at = now()
-       WHERE id = $7
-       RETURNING *`,
-      [this.estado, this.total, this.metodoPago, this.direccionEntrega,
-        this.fechaRetiro, JSON.stringify(this.historialEstados), this.id]
-    );
-    return buildPedido(rows[0], this.items);
+// Carga los ítems de varios pedidos en una sola consulta
+const conItems = async (rows, db = pool) => {
+  if (rows.length === 0) return [];
+  const { rows: itemRows } = await db.query(
+    'SELECT * FROM pedido_items WHERE pedido_id = ANY($1::uuid[]) ORDER BY id ASC',
+    [rows.map((row) => row.id)]
+  );
+  const porPedido = new Map(rows.map((row) => [row.id, []]));
+  itemRows.forEach((item) => porPedido.get(item.pedido_id).push(mapItemRow(item)));
+  return rows.map((row) => mapPedido(row, porPedido.get(row.id)));
+};
+
+const ORDENES = {
+  recientes: 'created_at DESC',
+  antiguos: 'created_at ASC',
+  retiro: 'fecha_retiro ASC NULLS LAST, created_at ASC'
+};
+
+// Arma el WHERE a partir de un filtro { usuario, estado, estados, numeroOrden, conFechaRetiro }
+const construirWhere = (filtro = {}) => {
+  const condiciones = [];
+  const valores = [];
+  const agregar = (sql, valor) => {
+    valores.push(valor);
+    condiciones.push(sql.replace('?', `$${valores.length}`));
   };
 
-  return pedido;
+  if (filtro.usuario !== undefined) agregar('usuario_id = ?', filtro.usuario);
+  if (filtro.estado !== undefined) agregar('estado = ?', filtro.estado);
+  if (filtro.estados !== undefined) agregar('estado = ANY(?::text[])', filtro.estados);
+  if (filtro.numeroOrden !== undefined) agregar('numero_orden = ?', filtro.numeroOrden);
+  if (filtro.conFechaRetiro) condiciones.push('fecha_retiro IS NOT NULL');
+
+  return { where: condiciones.length ? `WHERE ${condiciones.join(' AND ')}` : '', valores };
+};
+
+// Ejecuta fn(client) dentro de una transacción; si algo lanza, se deshace todo
+const enTransaccion = async (fn) => {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const resultado = await fn(client);
+    await client.query('COMMIT');
+    return resultado;
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
+  }
 };
 
 const Pedido = {
-  async find(filtro = {}) {
-    const condiciones = [];
-    const valores = [];
-
-    if (filtro.usuario !== undefined) {
-      valores.push(filtro.usuario);
-      condiciones.push(`usuario_id = $${valores.length}`);
+  // opciones: { orden: 'recientes' | 'antiguos' | 'retiro', limite, offset }
+  async find(filtro = {}, { orden = 'antiguos', limite, offset = 0 } = {}) {
+    const { where, valores } = construirWhere(filtro);
+    let sql = `SELECT * FROM pedidos ${where} ORDER BY ${ORDENES[orden] || ORDENES.antiguos}`;
+    if (limite !== undefined) {
+      valores.push(limite, offset);
+      sql += ` LIMIT $${valores.length - 1} OFFSET $${valores.length}`;
     }
-    if (filtro.estado !== undefined) {
-      valores.push(filtro.estado);
-      condiciones.push(`estado = $${valores.length}`);
-    }
-    if (filtro.numeroOrden !== undefined) {
-      valores.push(filtro.numeroOrden);
-      condiciones.push(`numero_orden = $${valores.length}`);
-    }
-
-    const where = condiciones.length ? `WHERE ${condiciones.join(' AND ')}` : '';
-    const { rows } = await pool.query(`SELECT * FROM pedidos ${where} ORDER BY created_at ASC`, valores);
-    return Promise.all(rows.map(async (row) => buildPedido(row, await cargarItems(row.id))));
+    const { rows } = await pool.query(sql, valores);
+    return conItems(rows);
   },
 
-  async findOne(query = {}) {
-    const resultados = await this.find(query);
-    return resultados[0] || null;
+  async count(filtro = {}) {
+    const { where, valores } = construirWhere(filtro);
+    const { rows } = await pool.query(`SELECT count(*)::int AS total FROM pedidos ${where}`, valores);
+    return rows[0].total;
+  },
+
+  async findOne(filtro = {}) {
+    const [pedido] = await this.find(filtro, { limite: 1 });
+    return pedido || null;
   },
 
   async findById(id) {
     if (!id) return null;
     const { rows } = await pool.query('SELECT * FROM pedidos WHERE id = $1', [id]);
-    if (!rows[0]) return null;
-    return buildPedido(rows[0], await cargarItems(rows[0].id));
+    const [pedido] = await conItems(rows);
+    return pedido || null;
   },
 
-  async create({ numeroOrden, usuario, items = [], total, metodoPago, direccionEntrega, fechaRetiro, historialEstados = [] }) {
-    const client = await pool.connect();
-    try {
-      await client.query('BEGIN');
-      const { rows } = await client.query(
-        `INSERT INTO pedidos (numero_orden, usuario_id, total, metodo_pago, direccion_entrega, fecha_retiro, historial_estados)
-         VALUES ($1, $2, $3, $4, $5, $6, $7)
-         RETURNING *`,
-        [numeroOrden, usuario, total, metodoPago, direccionEntrega, fechaRetiro || null, JSON.stringify(historialEstados)]
+  // Convierte el carrito del usuario en una reserva, todo en una transacción:
+  // si falta stock de un solo producto no se crea nada y el carrito queda igual.
+  async crearDesdeCarrito({ usuarioId, numeroOrden, fechaRetiro, nota, metodoPago, direccionEntrega }) {
+    return enTransaccion(async (client) => {
+      // Bloquea el carrito: si el cliente envía la reserva dos veces seguidas,
+      // la segunda espera a la primera y se encuentra el carrito ya vacío.
+      const { rows: [carrito] } = await client.query(
+        'SELECT id FROM carritos WHERE usuario_id = $1 FOR UPDATE',
+        [usuarioId]
       );
-      const pedido = rows[0];
+      const { rows: itemsCarrito } = carrito
+        ? await client.query(
+          // Orden fijo por producto para que dos reservas simultáneas bloqueen
+          // las filas en el mismo orden y no se trabe una con otra
+          'SELECT producto_id, cantidad FROM carrito_items WHERE carrito_id = $1 ORDER BY producto_id',
+          [carrito.id]
+        )
+        : { rows: [] };
+
+      if (itemsCarrito.length === 0) {
+        throw new ApiError('El carrito está vacío', 400);
+      }
+
+      // Descuento atómico: el UPDATE solo afecta la fila si alcanza el stock, y
+      // la base de datos serializa las reservas simultáneas sobre el mismo producto.
+      const items = [];
+      for (const item of itemsCarrito) {
+        const { rows: [producto] } = await client.query(
+          `UPDATE productos
+              SET stock = stock - $1, ventas_realizadas = ventas_realizadas + $1, updated_at = now()
+            WHERE id = $2 AND activo AND stock >= $1
+          RETURNING precio`,
+          [item.cantidad, item.producto_id]
+        );
+
+        if (!producto) {
+          const { rows: [actual] } = await client.query(
+            'SELECT nombre, stock, activo FROM productos WHERE id = $1',
+            [item.producto_id]
+          );
+          if (!actual || !actual.activo) {
+            throw new ApiError(`${actual ? actual.nombre : 'Un producto del carrito'} ya no está disponible; quítalo del carrito`, 409);
+          }
+          throw new ApiError(`Stock insuficiente para ${actual.nombre}. Disponible: ${actual.stock}`, 409);
+        }
+
+        // Se cobra el precio vigente al reservar, no el que tenía al agregarlo al carrito
+        items.push({
+          producto: item.producto_id,
+          cantidad: item.cantidad,
+          precioUnitario: producto.precio,
+          subtotal: item.cantidad * producto.precio
+        });
+      }
+
+      const total = items.reduce((suma, item) => suma + item.subtotal, 0);
+      const historial = [{ estado: 'pendiente', fecha: new Date(), nota: 'Reserva creada' }];
+
+      const { rows: [pedido] } = await client.query(
+        `INSERT INTO pedidos (numero_orden, usuario_id, total, metodo_pago, direccion_entrega, fecha_retiro, nota, historial_estados)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+         RETURNING *`,
+        [numeroOrden, usuarioId, total, metodoPago, direccionEntrega, fechaRetiro, nota || null, JSON.stringify(historial)]
+      );
+
       for (const item of items) {
         await client.query(
           `INSERT INTO pedido_items (pedido_id, producto_id, cantidad, precio_unitario, subtotal)
@@ -102,28 +184,51 @@ const Pedido = {
           [pedido.id, item.producto, item.cantidad, item.precioUnitario, item.subtotal]
         );
       }
-      await client.query('COMMIT');
-      return buildPedido(pedido, items);
-    } catch (error) {
-      await client.query('ROLLBACK');
-      throw error;
-    } finally {
-      client.release();
-    }
+
+      await client.query('DELETE FROM carrito_items WHERE carrito_id = $1', [carrito.id]);
+      await client.query('UPDATE carritos SET total = 0, updated_at = now() WHERE id = $1', [carrito.id]);
+
+      return mapPedido(pedido, items);
+    });
   },
 
-  async findByIdAndUpdate(id, update = {}) {
-    const actual = await this.findById(id);
-    if (!actual) return null;
+  // Cambia el estado validando la transición; si se cancela, devuelve el stock.
+  // La fila del pedido queda bloqueada durante el cambio: si dos personas cancelan
+  // a la vez, la segunda ve el estado ya cancelado y el stock no se devuelve dos veces.
+  async cambiarEstado(id, estado, nota) {
+    return enTransaccion(async (client) => {
+      const { rows: [actual] } = await client.query('SELECT * FROM pedidos WHERE id = $1 FOR UPDATE', [id]);
+      if (!actual) {
+        throw new ApiError('Pedido no encontrado', 404);
+      }
+      if (actual.estado === estado) {
+        throw new ApiError('El pedido ya tiene ese estado', 400);
+      }
+      if (!(TRANSICIONES_ESTADO[actual.estado] || []).includes(estado)) {
+        throw new ApiError(`No se puede cambiar de ${actual.estado} a ${estado}`, 400);
+      }
 
-    actual.estado = update.estado ?? actual.estado;
-    actual.total = update.total ?? actual.total;
-    actual.metodoPago = update.metodoPago ?? actual.metodoPago;
-    actual.direccionEntrega = update.direccionEntrega ?? actual.direccionEntrega;
-    actual.fechaRetiro = update.fechaRetiro ?? actual.fechaRetiro;
-    actual.historialEstados = update.historialEstados ?? actual.historialEstados;
+      if (estado === 'cancelado') {
+        await client.query(
+          `UPDATE productos p
+              SET stock = p.stock + pi.cantidad,
+                  ventas_realizadas = p.ventas_realizadas - pi.cantidad,
+                  updated_at = now()
+             FROM pedido_items pi
+            WHERE pi.pedido_id = $1 AND pi.producto_id = p.id`,
+          [id]
+        );
+      }
 
-    return actual.save();
+      const historial = [...(actual.historial_estados || []), { estado, fecha: new Date(), nota }];
+      const { rows } = await client.query(
+        `UPDATE pedidos SET estado = $1, historial_estados = $2, updated_at = now()
+          WHERE id = $3 RETURNING *`,
+        [estado, JSON.stringify(historial), id]
+      );
+      const [pedido] = await conItems(rows, client);
+      return pedido;
+    });
   }
 };
 

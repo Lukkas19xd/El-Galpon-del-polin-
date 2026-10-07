@@ -1,9 +1,11 @@
 import express from 'express';
 import { obtenerCarrito, agregarAlCarrito, eliminarDelCarrito, actualizarCarrito, vaciarCarrito } from '../controllers/carritoController.js';
 import { verificarToken, verificarCliente } from '../middlewares/auth.js';
-import { validarItemCarrito, validarActualizarCarrito } from '../middlewares/validacion.js';
+import { validarId, validarItemCarrito, validarActualizarCarrito } from '../middlewares/validacion.js';
 
 const router = express.Router();
+
+router.param('productoId', validarId('Producto no encontrado en el carrito'));
 
 // Todas las rutas requieren autenticación
 router.get('/', verificarToken, verificarCliente, obtenerCarrito);

@@ -1,4 +1,4 @@
--- Esquema relacional de El Galpón del Polín (PostgreSQL 13+, usa gen_random_uuid() nativo)
+-- Esquema relacional de Agroforestal Monte Redondo SPA (PostgreSQL 13+, usa gen_random_uuid() nativo)
 
 CREATE TABLE IF NOT EXISTS usuarios (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -28,6 +28,9 @@ CREATE TABLE IF NOT EXISTS productos (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Foto del producto: URL o ruta relativa al frontend (agregada después)
+ALTER TABLE productos ADD COLUMN IF NOT EXISTS imagen TEXT;
 
 CREATE INDEX IF NOT EXISTS productos_activo_idx ON productos (activo);
 CREATE INDEX IF NOT EXISTS productos_tipo_idx ON productos (tipo);
@@ -64,6 +67,13 @@ CREATE TABLE IF NOT EXISTS pedidos (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Nota opcional que deja el cliente al reservar (agregada después; ALTER para bases existentes)
+ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS nota TEXT;
+
+-- Los estados pasaron de envío a retiro: enviado -> listo, entregado -> retirado
+UPDATE pedidos SET estado = 'listo' WHERE estado = 'enviado';
+UPDATE pedidos SET estado = 'retirado' WHERE estado = 'entregado';
 
 CREATE INDEX IF NOT EXISTS pedidos_usuario_idx ON pedidos (usuario_id);
 CREATE INDEX IF NOT EXISTS pedidos_estado_idx ON pedidos (estado);

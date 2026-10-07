@@ -1,38 +1,33 @@
 <section id="seccion-checkout" class="hidden">
-  <h2 class="mb-6 border-b-4 border-madera pb-4 text-2xl font-bold text-bosque">Finalizar Compra</h2>
+  <h2 class="mb-6 border-b-4 border-madera pb-4 text-2xl font-bold text-bosque">Confirmar reserva</h2>
   <form id="formCheckout" onsubmit="handleCompra(event)">
     <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
       <div class="rounded-md border-l-4 border-bosque bg-neutral-50 p-6">
-        <h3 class="mb-4 text-lg font-bold text-bosque">Resumen del Pedido</h3>
+        <h3 class="mb-4 text-lg font-bold text-bosque">Resumen</h3>
         <div id="resumenPedido"></div>
       </div>
       <div class="space-y-5 rounded-md border-l-4 border-bosque bg-neutral-50 p-6">
-        <h3 class="text-lg font-bold text-bosque">Dirección de Entrega</h3>
+        <h3 class="text-lg font-bold text-bosque">Retiro en el galpón</h3>
+        <p class="text-sm text-neutral-600">Reservamos tus productos y los pagas al momento de retirarlos.</p>
+        <p id="checkoutLugarRetiro" class="text-sm text-neutral-700"></p>
         <div>
-          <label class="mb-1 block text-sm font-semibold text-neutral-700">Calle:</label>
-          <input type="text" id="checkoutCalle" required class="w-full rounded-md border border-neutral-300 px-3 py-2">
+          <label for="checkoutFechaRetiro" class="mb-1 block text-sm font-semibold text-neutral-700">Fecha de retiro</label>
+          <input type="date" id="checkoutFechaRetiro" required onchange="validarFechaRetiroCheckout()" aria-describedby="checkoutFechaAyuda" class="w-full rounded-md border border-neutral-300 px-3 py-2">
+          <p id="checkoutFechaAyuda" class="mt-1 text-xs text-neutral-500"></p>
+        </div>
+        <!-- Solo aparece si la cuenta no tiene teléfono: se guarda en el perfil al reservar -->
+        <div id="checkoutBloqueTelefono" class="hidden">
+          <label for="checkoutTelefono" class="mb-1 block text-sm font-semibold text-neutral-700">Teléfono de contacto</label>
+          <input type="tel" id="checkoutTelefono" autocomplete="tel" placeholder="+56 9 1234 5678" pattern="[0-9+\s\(\)\-]{6,20}" class="w-full rounded-md border border-neutral-300 px-3 py-2">
+          <p class="mt-1 text-xs text-neutral-500">Para avisarte si hay algún problema con tu reserva.</p>
         </div>
         <div>
-          <label class="mb-1 block text-sm font-semibold text-neutral-700">Número:</label>
-          <input type="text" id="checkoutNumero" required class="w-full rounded-md border border-neutral-300 px-3 py-2">
+          <label for="checkoutNota" class="mb-1 block text-sm font-semibold text-neutral-700">Nota (opcional)</label>
+          <textarea id="checkoutNota" rows="3" maxlength="500" placeholder="Ej: retiro en la tarde, vengo con camioneta" class="w-full rounded-md border border-neutral-300 px-3 py-2"></textarea>
         </div>
-        <div>
-          <label class="mb-1 block text-sm font-semibold text-neutral-700">Ciudad:</label>
-          <input type="text" id="checkoutCiudad" required class="w-full rounded-md border border-neutral-300 px-3 py-2">
-        </div>
-        <div>
-          <label class="mb-1 block text-sm font-semibold text-neutral-700">Código Postal:</label>
-          <input type="text" id="checkoutCP" required class="w-full rounded-md border border-neutral-300 px-3 py-2">
-        </div>
-        <h3 class="text-lg font-bold text-bosque">Método de Pago</h3>
-        <div class="space-y-2 text-sm">
-          <label class="flex items-center gap-2"><input type="radio" name="metodoPago" value="efectivo" checked> Efectivo</label>
-          <label class="flex items-center gap-2"><input type="radio" name="metodoPago" value="tarjeta"> Tarjeta de Crédito</label>
-          <label class="flex items-center gap-2"><input type="radio" name="metodoPago" value="transferencia"> Transferencia Bancaria</label>
-        </div>
-        <button type="submit" class="w-full rounded-md bg-madera px-6 py-3 font-bold text-white shadow hover:bg-madera-claro">Completar Pedido</button>
+        <button type="submit" class="w-full rounded-md bg-madera px-6 py-3 font-bold text-white shadow hover:bg-madera-claro disabled:cursor-wait disabled:opacity-60">Confirmar reserva</button>
       </div>
     </div>
   </form>
-  <div id="checkoutError" class="error-message hidden mt-4 rounded-md bg-red-50 px-4 py-3 text-sm font-semibold text-red-700"></div>
+  <div id="checkoutError" class="hidden mt-4 rounded-md bg-red-50 px-4 py-3 text-sm font-semibold text-red-700" role="alert"></div>
 </section>

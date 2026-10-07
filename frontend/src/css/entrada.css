@@ -1,0 +1,64 @@
+/* Fuente de los estilos: `npm run css` la compila a estilos.css (el que carga la página). */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Fondo de bosque armado con 3 capas de SVG en mosaico (sin imágenes externas):
+   cada capa repite una silueta de pino con distinto tamaño/color para dar profundidad.
+   Se usan en el hero de inicio y, invertidas, en el pie de página. */
+.bosque-capa-fondo {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,10 80,55 20,55' fill='%233A7A4F'/%3E%3Cpolygon points='50,30 85,75 15,75' fill='%233A7A4F'/%3E%3Cpolygon points='50,50 100,100 0,100' fill='%233A7A4F'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-position: bottom;
+  background-size: 90px 100px;
+}
+.bosque-capa-medio {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 120'%3E%3Cpolygon points='50,0 82,50 18,50' fill='%232D5F3F'/%3E%3Cpolygon points='50,22 88,70 12,70' fill='%232D5F3F'/%3E%3Cpolygon points='50,45 100,120 0,120' fill='%232D5F3F'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-position: bottom;
+  background-size: 120px 140px;
+}
+.bosque-capa-frente {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140'%3E%3Cpolygon points='50,0 83,52 17,52' fill='%23163D27'/%3E%3Cpolygon points='50,24 90,78 10,78' fill='%23163D27'/%3E%3Cpolygon points='50,50 100,140 0,140' fill='%23163D27'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-position: bottom;
+  background-size: 150px 170px;
+}
+
+/* Foto de pinos de fondo (Unsplash, licencia libre) fija detrás del contenido,
+   con un velo verde oscuro para que el texto y las tarjetas se lean bien.
+   La ruta es relativa a este CSS (src/css/). */
+body {
+  background-color: #0F2A1B;
+  background-image:
+    linear-gradient(rgba(15, 42, 27, 0.25), rgba(15, 42, 27, 0.6)),
+    url("../img/fondo-pinos.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+/* Las vistas con títulos sueltos van sobre un panel claro para no perderse
+   contra la foto; inicio, login y registro ya traen sus propias tarjetas. */
+#main-content > section:not(#seccion-inicio):not(#seccion-login):not(#seccion-registro) {
+  background-color: rgba(255, 255, 255, 0.96);
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+@media (max-width: 640px) {
+  #main-content > section:not(#seccion-inicio):not(#seccion-login):not(#seccion-registro) {
+    padding: 1.25rem;
+  }
+}
+
+/* Foco visible al navegar con teclado (no aparece al hacer clic con el mouse) */
+:focus-visible {
+  outline: 3px solid #A0644E;
+  outline-offset: 2px;
+}
+
+/* El celular no soporta bien el fondo fijo: lo dejamos desplazarse */
+@media (max-width: 768px) {
+  body { background-attachment: scroll; }
+}

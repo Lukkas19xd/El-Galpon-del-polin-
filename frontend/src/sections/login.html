@@ -1,20 +1,21 @@
 <section id="seccion-login" class="hidden">
   <div class="flex min-h-[28rem] items-center justify-center">
     <div class="w-full max-w-sm rounded-lg border-t-4 border-bosque bg-white p-8 shadow-md">
-      <h2 class="mb-6 text-2xl font-bold text-bosque">Iniciar Sesión</h2>
+      <h2 class="mb-2 text-2xl font-bold text-bosque">Iniciar sesión</h2>
+      <p id="loginMotivo" class="mb-6 text-sm text-neutral-500">Entra para reservar y ver tus reservas.</p>
       <form id="formLogin" onsubmit="handleLogin(event)" class="space-y-5">
         <div>
-          <label for="loginEmail" class="mb-1 block text-sm font-semibold text-neutral-700">Email:</label>
-          <input type="email" id="loginEmail" required class="w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-bosque focus:outline-none focus:ring-2 focus:ring-bosque/20">
+          <label for="loginEmail" class="mb-1 block text-sm font-semibold text-neutral-700">Email</label>
+          <input type="email" id="loginEmail" required autocomplete="email" class="w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-bosque focus:outline-none focus:ring-2 focus:ring-bosque/20">
         </div>
         <div>
-          <label for="loginPassword" class="mb-1 block text-sm font-semibold text-neutral-700">Contraseña:</label>
-          <input type="password" id="loginPassword" required class="w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-bosque focus:outline-none focus:ring-2 focus:ring-bosque/20">
+          <label for="loginPassword" class="mb-1 block text-sm font-semibold text-neutral-700">Contraseña</label>
+          <input type="password" id="loginPassword" required autocomplete="current-password" class="w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-bosque focus:outline-none focus:ring-2 focus:ring-bosque/20">
         </div>
-        <button type="submit" class="w-full rounded-md bg-madera px-6 py-3 font-bold text-white shadow transition hover:-translate-y-0.5 hover:bg-madera-claro">Iniciar Sesión</button>
-        <p class="text-center text-sm">¿No tienes cuenta? <a href="#" onclick="cambiarVista('registro')" class="font-bold text-madera">Registrarse</a></p>
+        <button type="submit" class="w-full rounded-md bg-madera px-6 py-3 font-bold text-white shadow transition hover:-translate-y-0.5 hover:bg-madera-claro disabled:cursor-wait disabled:opacity-60">Iniciar sesión</button>
+        <p class="text-center text-sm">¿No tienes cuenta? <a href="#/registro" class="font-bold text-madera underline-offset-2 hover:underline">Regístrate</a></p>
       </form>
-      <div id="loginError" class="error-message hidden mt-4 rounded-md bg-red-50 px-4 py-3 text-sm font-semibold text-red-700"></div>
+      <div id="loginError" class="hidden mt-4 rounded-md bg-red-50 px-4 py-3 text-sm font-semibold text-red-700" role="alert"></div>
     </div>
   </div>
 </section>

@@ -3,9 +3,13 @@ import { ApiError, asyncHandler } from '../utils/errorHandler.js';
 
 // Obtener todos los productos
 export const obtenerProductos = asyncHandler(async (req, res) => {
-  const { tipo, categoria, pagina = 1, limite = 10 } = req.query;
+  const { tipo, categoria } = req.query;
+  const busqueda = typeof req.query.q === 'string' ? req.query.q.trim().slice(0, 100) : '';
+  const pagina = Math.max(1, parseInt(req.query.pagina, 10) || 1);
+  const limite = Math.max(1, parseInt(req.query.limite, 10) || 10);
 
-  const filtro = { activo: true };
+  const filtro = { activo: true, ordenCatalogo: true };
+  if (busqueda) filtro.busqueda = busqueda;
   if (tipo) filtro.tipo = tipo;
   if (categoria) filtro.categoria = categoria;
 
@@ -21,6 +25,12 @@ export const obtenerProductos = asyncHandler(async (req, res) => {
     paginaActual: pagina,
     productos: productosPaginados
   });
+});
+
+// Todos los productos, también los desactivados (solo admin), para poder editarlos
+export const obtenerProductosAdmin = asyncHandler(async (req, res) => {
+  const productos = await Producto.find({ ordenCatalogo: true });
+  res.status(200).json({ success: true, total: productos.length, productos });
 });
 
 // Obtener un producto por ID
@@ -39,7 +49,7 @@ export const obtenerProducto = asyncHandler(async (req, res) => {
 
 // Crear nuevo producto (solo admin)
 export const crearProducto = asyncHandler(async (req, res) => {
-  const { nombre, descripcion, precio, stock, tipo, categoria, especificaciones } = req.body;
+  const { nombre, descripcion, precio, stock, tipo, categoria, especificaciones, imagen } = req.body;
 
   const producto = await Producto.create({
     nombre,
@@ -48,7 +58,8 @@ export const crearProducto = asyncHandler(async (req, res) => {
     stock,
     tipo,
     categoria,
-    especificaciones
+    especificaciones,
+    imagen
   });
 
   res.status(201).json({
@@ -61,12 +72,11 @@ export const crearProducto = asyncHandler(async (req, res) => {
 // Actualizar producto (solo admin)
 export const actualizarProducto = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { nombre, descripcion, precio, stock, tipo, categoria, especificaciones, activo } = req.body;
+  const { nombre, descripcion, precio, stock, tipo, categoria, especificaciones, imagen, activo } = req.body;
 
   const producto = await Producto.findByIdAndUpdate(
     id,
-    { nombre, descripcion, precio, stock, tipo, categoria, especificaciones, activo, updatedAt: Date.now() },
-    { new: true, runValidators: true }
+    { nombre, descripcion, precio, stock, tipo, categoria, especificaciones, imagen, activo }
   );
 
   if (!producto) {
@@ -84,11 +94,7 @@ export const actualizarProducto = asyncHandler(async (req, res) => {
 export const eliminarProducto = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  const producto = await Producto.findByIdAndUpdate(
-    id,
-    { activo: false, updatedAt: Date.now() },
-    { new: true }
-  );
+  const producto = await Producto.findByIdAndUpdate(id, { activo: false });
 
   if (!producto) {
     throw new ApiError('Producto no encontrado', 404);
@@ -106,7 +112,7 @@ export const validarStock = asyncHandler(async (req, res) => {
 
   const producto = await Producto.findById(productoId);
 
-  if (!producto) {
+  if (!producto || !producto.activo) {
     throw new ApiError('Producto no encontrado', 404);
   }
 

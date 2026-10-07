@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# Script de Instalación - El Galpón del Polín
+# Script de Instalación - Agroforestal Monte Redondo SPA
 # Este script automatiza la instalación del proyecto
 
 echo "=================================="
-echo "🚀 El Galpón del Polín - Instalación"
+echo "🚀 Agroforestal Monte Redondo SPA - Instalación"
 echo "=================================="
 echo ""
 

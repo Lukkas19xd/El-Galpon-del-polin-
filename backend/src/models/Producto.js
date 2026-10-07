@@ -13,22 +13,10 @@ const mapRow = (row) => {
     categoria: row.categoria,
     activo: row.activo,
     especificaciones: row.especificaciones,
+    imagen: row.imagen,
     ventasRealizadas: row.ventas_realizadas,
     createdAt: row.created_at,
     updatedAt: row.updated_at
-  };
-  producto.save = async function () {
-    const { rows } = await pool.query(
-      `UPDATE productos
-         SET nombre = $1, descripcion = $2, precio = $3, stock = $4, tipo = $5,
-             categoria = $6, activo = $7, especificaciones = $8, ventas_realizadas = $9,
-             updated_at = now()
-       WHERE id = $10
-       RETURNING *`,
-      [this.nombre, this.descripcion, this.precio, this.stock, this.tipo, this.categoria,
-        this.activo, this.especificaciones, this.ventasRealizadas, this.id]
-    );
-    return mapRow(rows[0]);
   };
   return producto;
 };
@@ -54,9 +42,15 @@ const Producto = {
       valores.push(filtro.nombre);
       condiciones.push(`nombre = $${valores.length}`);
     }
+    if (filtro.busqueda) {
+      // Los comodines de LIKE (% _ \) que escriba el usuario se buscan como texto
+      valores.push(`%${filtro.busqueda.replace(/[\\%_]/g, '\\$&')}%`);
+      condiciones.push(`(nombre ILIKE $${valores.length} OR descripcion ILIKE $${valores.length})`);
+    }
 
     const where = condiciones.length ? `WHERE ${condiciones.join(' AND ')}` : '';
-    const { rows } = await pool.query(`SELECT * FROM productos ${where} ORDER BY created_at ASC`, valores);
+    const orden = filtro.ordenCatalogo ? 'categoria ASC, precio ASC' : 'created_at ASC';
+    const { rows } = await pool.query(`SELECT * FROM productos ${where} ORDER BY ${orden}`, valores);
     return rows.map(mapRow);
   },
 
@@ -71,12 +65,18 @@ const Producto = {
     return mapRow(rows[0]);
   },
 
-  async create({ nombre, descripcion, precio, stock, tipo, categoria, especificaciones, activo = true }) {
+  async findByIds(ids = []) {
+    if (ids.length === 0) return [];
+    const { rows } = await pool.query('SELECT * FROM productos WHERE id = ANY($1::uuid[])', [ids]);
+    return rows.map(mapRow);
+  },
+
+  async create({ nombre, descripcion, precio, stock, tipo, categoria, especificaciones, imagen, activo = true }) {
     const { rows } = await pool.query(
-      `INSERT INTO productos (nombre, descripcion, precio, stock, tipo, categoria, especificaciones, activo)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      `INSERT INTO productos (nombre, descripcion, precio, stock, tipo, categoria, especificaciones, imagen, activo)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
        RETURNING *`,
-      [nombre, descripcion, precio, stock, tipo, categoria, especificaciones, activo]
+      [nombre, descripcion, precio, stock, tipo, categoria, especificaciones, imagen || null, activo]
     );
     return mapRow(rows[0]);
   },
@@ -94,25 +94,21 @@ const Producto = {
       categoria: update.categoria ?? actual.categoria,
       activo: update.activo ?? actual.activo,
       especificaciones: update.especificaciones ?? actual.especificaciones,
+      // '' borra la imagen; undefined la deja como estaba
+      imagen: update.imagen === undefined ? actual.imagen : (update.imagen || null),
       ventasRealizadas: actual.ventasRealizadas
     };
-
-    if (update.$inc) {
-      if (update.$inc.stock !== undefined) siguiente.stock = actual.stock + update.$inc.stock;
-      if (update.$inc.ventasRealizadas !== undefined) {
-        siguiente.ventasRealizadas = actual.ventasRealizadas + update.$inc.ventasRealizadas;
-      }
-    }
 
     const { rows } = await pool.query(
       `UPDATE productos
          SET nombre = $1, descripcion = $2, precio = $3, stock = $4, tipo = $5,
-             categoria = $6, activo = $7, especificaciones = $8, ventas_realizadas = $9,
-             updated_at = now()
-       WHERE id = $10
+             categoria = $6, activo = $7, especificaciones = $8, imagen = $9,
+             ventas_realizadas = $10, updated_at = now()
+       WHERE id = $11
        RETURNING *`,
       [siguiente.nombre, siguiente.descripcion, siguiente.precio, siguiente.stock, siguiente.tipo,
-        siguiente.categoria, siguiente.activo, siguiente.especificaciones, siguiente.ventasRealizadas, id]
+        siguiente.categoria, siguiente.activo, siguiente.especificaciones, siguiente.imagen,
+        siguiente.ventasRealizadas, id]
     );
     return mapRow(rows[0]);
   }

@@ -5,7 +5,6 @@ const SECCIONES = [
   'login',
   'registro',
   'productos',
-  'dashboard',
   'mis-reservas',
   'carrito',
   'checkout',
@@ -15,10 +14,23 @@ const SECCIONES = [
 
 async function cargarSecciones() {
   const main = document.getElementById('main-content');
-  const htmls = await Promise.all(
-    SECCIONES.map((nombre) => fetch(`src/sections/${nombre}.html`).then((res) => res.text()))
-  );
-  main.innerHTML = htmls.join('\n');
+  try {
+    const htmls = await Promise.all(
+      SECCIONES.map(async (nombre) => {
+        const res = await fetch(`src/sections/${nombre}.html`, { cache: 'no-cache' });
+        if (!res.ok) throw new Error(`No se encontró la vista ${nombre}`);
+        return res.text();
+      })
+    );
+    main.innerHTML = htmls.join('\n');
+  } catch (error) {
+    main.innerHTML = `
+      <div class="rounded-2xl bg-white p-8 text-center shadow-2xl">
+        <p class="mb-4 font-semibold text-red-700">No se pudo cargar la página. Revisa tu conexión.</p>
+        <button type="button" onclick="location.reload()" class="rounded-md bg-madera px-6 py-2 font-bold text-white">Reintentar</button>
+      </div>`;
+    throw error;
+  }
 }
 
 window.seccionesListas = cargarSecciones();

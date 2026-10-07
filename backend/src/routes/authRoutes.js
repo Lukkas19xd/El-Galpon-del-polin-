@@ -1,21 +1,25 @@
 import express from 'express';
-import { registroUsuario, loginUsuario, obtenerPerfil, actualizarPerfil, obtenerUsuarios, cambiarContrasena } from '../controllers/authController.js';
+import { registroUsuario, loginUsuario, obtenerPerfil, actualizarPerfil, obtenerUsuarios, actualizarUsuario, cambiarContrasena } from '../controllers/authController.js';
 import { verificarToken, verificarAdmin } from '../middlewares/auth.js';
-import { validarRegistro, validarLogin } from '../middlewares/validacion.js';
+import { validarId, validarRegistro, validarLogin, validarPerfil, validarCambioContrasena, validarActualizarUsuario } from '../middlewares/validacion.js';
+import { limiteLogin, limiteRegistro } from '../middlewares/limites.js';
 
 const router = express.Router();
 
-// Rutas públicas
-router.post('/registro', validarRegistro, registroUsuario);
-router.post('/login', validarLogin, loginUsuario);
+router.param('id', validarId('Usuario no encontrado'));
 
-// Rutas protegidas para usuarios autenticados
+// Rutas públicas
+router.post('/registro', limiteRegistro, validarRegistro, registroUsuario);
+router.post('/login', limiteLogin, validarLogin, loginUsuario);
+
+// Rutas protegidas
 router.get('/perfil', verificarToken, obtenerPerfil);
 router.get('/me', verificarToken, obtenerPerfil);
-router.put('/perfil', verificarToken, actualizarPerfil);
-router.put('/cambiar-contrasena', verificarToken, cambiarContrasena);
+router.put('/perfil', verificarToken, validarPerfil, actualizarPerfil);
+router.put('/cambiar-contrasena', verificarToken, limiteLogin, validarCambioContrasena, cambiarContrasena);
 
 // Rutas solo para administrador
 router.get('/usuarios', verificarToken, verificarAdmin, obtenerUsuarios);
+router.put('/usuarios/:id', verificarToken, verificarAdmin, validarActualizarUsuario, actualizarUsuario);
 
 export default router;
