@@ -1,0 +1,19 @@
+<section id="seccion-carrito" class="hidden">
+  <h2 class="mb-6 border-b-4 border-madera pb-4 text-2xl font-bold text-bosque">Tu carrito</h2>
+  <div id="carritoEstado"></div>
+  <div id="carritoVacio" class="hidden py-12 text-center text-neutral-500">
+    <p class="mb-4">Tu carrito está vacío.</p>
+    <a href="#/productos" class="inline-block rounded-md bg-madera px-6 py-3 font-bold text-white shadow hover:bg-madera-claro">Ver productos</a>
+  </div>
+  <div id="carritoContenido" class="hidden">
+    <ul id="carritoItems" class="divide-y divide-neutral-200"></ul>
+    <div class="mt-6 border-t-2 border-madera pt-4 text-right">
+      <p class="text-2xl font-bold text-madera">Total: <span id="carritoTotal">$0</span></p>
+      <p class="text-sm text-neutral-500">Se paga al retirar en el galpón.</p>
+    </div>
+    <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+      <a href="#/productos" class="rounded-md bg-neutral-600 px-6 py-3 text-center font-bold text-white shadow hover:bg-neutral-700">Seguir viendo productos</a>
+      <a href="#/reservar" class="rounded-md bg-madera px-6 py-3 text-center font-bold text-white shadow hover:bg-madera-claro">Continuar con la reserva</a>
+    </div>
+  </div>
+</section>

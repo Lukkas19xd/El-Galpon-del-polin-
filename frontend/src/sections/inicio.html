@@ -1,0 +1,72 @@
+<section id="seccion-inicio">
+  <div class="relative isolate overflow-hidden rounded-2xl shadow-2xl">
+    <!-- Cielo -->
+    <div class="absolute inset-0 bg-gradient-to-b from-bosque-noche via-bosque to-bosque-claro"></div>
+    <!-- Resplandor -->
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.2),transparent_60%)]"></div>
+    <!-- Capas de pinos (profundidad) -->
+    <div class="bosque-capa-fondo absolute inset-x-0 bottom-0 h-40 opacity-40"></div>
+    <div class="bosque-capa-medio absolute inset-x-0 bottom-0 h-52 opacity-65"></div>
+    <div class="bosque-capa-frente absolute inset-x-0 bottom-0 h-64 opacity-90"></div>
+    <!-- Oscurecedor para contraste del texto -->
+    <div class="absolute inset-0 bg-black/25"></div>
+
+    <!-- Contenido -->
+    <div class="relative px-6 py-24 text-center text-white sm:py-32">
+      <img src="src/img/logo.png" alt="" class="mx-auto mb-6 h-28 w-28 rounded-2xl bg-black p-3 shadow-2xl sm:h-36 sm:w-36">
+      <h1 class="mb-4 text-3xl font-extrabold tracking-tight drop-shadow-lg sm:text-5xl">Agroforestal Monte Redondo SPA</h1>
+      <p class="mx-auto mb-10 max-w-xl text-lg text-white/90 drop-shadow sm:text-xl">Polines impregnados y leña seca en saco, listos para reservar y retirar</p>
+      <a href="#/productos" class="inline-block rounded-md bg-madera px-8 py-4 text-lg font-bold shadow-lg transition hover:-translate-y-0.5 hover:bg-madera-claro">Ver catálogo</a>
+    </div>
+  </div>
+
+  <!-- Categorías: llevan al catálogo ya filtrado -->
+  <div class="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+    <a href="#/productos?categoria=industrial" class="group block rounded-xl border border-neutral-200 bg-white p-6 text-left shadow-sm transition hover:-translate-y-1 hover:border-madera hover:shadow-lg">
+      <span class="mb-3 block text-4xl">🏭</span>
+      <h3 class="mb-1 text-lg font-bold text-bosque">Industrial</h3>
+      <p class="text-sm text-neutral-500">Polines para proyectos industriales de gran escala.</p>
+    </a>
+    <a href="#/productos?categoria=construccion" class="group block rounded-xl border border-neutral-200 bg-white p-6 text-left shadow-sm transition hover:-translate-y-1 hover:border-madera hover:shadow-lg">
+      <span class="mb-3 block text-4xl">🏗️</span>
+      <h3 class="mb-1 text-lg font-bold text-bosque">Construcción</h3>
+      <p class="text-sm text-neutral-500">Soluciones en madera para obra y estructura.</p>
+    </a>
+    <a href="#/productos?categoria=agricola" class="group block rounded-xl border border-neutral-200 bg-white p-6 text-left shadow-sm transition hover:-translate-y-1 hover:border-madera hover:shadow-lg">
+      <span class="mb-3 block text-4xl">🌾</span>
+      <h3 class="mb-1 text-lg font-bold text-bosque">Agrícola</h3>
+      <p class="text-sm text-neutral-500">Polines resistentes para uso agrícola.</p>
+    </a>
+    <a href="#/productos?categoria=lena" class="group block rounded-xl border border-neutral-200 bg-white p-6 text-left shadow-sm transition hover:-translate-y-1 hover:border-madera hover:shadow-lg">
+      <span class="mb-3 block text-4xl">🪵</span>
+      <h3 class="mb-1 text-lg font-bold text-bosque">Leña en saco</h3>
+      <p class="text-sm text-neutral-500">Leña seca lista para la estufa, la cocina y el asado.</p>
+    </a>
+  </div>
+
+  <!-- Dónde retirar: se completa con los datos de GET /api/negocio (ver renderNegocio en app.js) -->
+  <div class="mt-16 grid grid-cols-1 overflow-hidden rounded-2xl bg-white shadow-2xl md:grid-cols-2">
+    <div class="space-y-6 p-8">
+      <div>
+        <h2 class="mb-1 text-2xl font-bold text-bosque">Dónde retirar tu pedido</h2>
+        <p class="text-sm text-neutral-500">Reservas en línea, retiras y pagas en el galpón.</p>
+      </div>
+      <div>
+        <h3 class="mb-1 text-sm font-bold uppercase tracking-wide text-madera">Dirección</h3>
+        <p id="negocioDireccion" class="text-neutral-800">—</p>
+      </div>
+      <div>
+        <h3 class="mb-2 text-sm font-bold uppercase tracking-wide text-madera">Horario de atención</h3>
+        <ul id="negocioHorario" class="divide-y divide-neutral-100 text-sm"></ul>
+      </div>
+      <div class="flex flex-wrap gap-3">
+        <a id="negocioComoLlegar" href="#" target="_blank" rel="noopener" class="hidden rounded-md bg-bosque px-5 py-3 font-bold text-white shadow hover:bg-bosque-claro">📍 Cómo llegar</a>
+        <a id="negocioWhatsapp" href="#" target="_blank" rel="noopener" class="hidden rounded-md bg-[#25D366] px-5 py-3 font-bold text-white shadow hover:brightness-95">💬 Escríbenos por WhatsApp</a>
+      </div>
+    </div>
+    <div class="min-h-[18rem] bg-neutral-100">
+      <iframe id="negocioMapa" title="Mapa de ubicación" class="hidden h-full min-h-[18rem] w-full border-0" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      <div id="negocioMapaVacio" class="flex h-full min-h-[18rem] items-center justify-center p-8 text-center text-sm text-neutral-400">Mapa disponible próximamente</div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,26 @@
+<section id="seccion-productos" class="hidden">
+  <h2 class="mb-6 border-b-4 border-madera pb-4 text-2xl font-bold text-bosque">Catálogo de productos</h2>
+  <!-- Los filtros quedan en la dirección (#/productos?categoria=lena&q=...) para poder compartir el enlace -->
+  <form class="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto_auto]" role="search" onsubmit="event.preventDefault(); aplicarFiltros()">
+    <label for="busquedaProducto" class="sr-only">Buscar productos</label>
+    <input type="search" id="busquedaProducto" oninput="buscarConPausa()" placeholder="Buscar: eucalipto, 3 metros, astillas…"
+           class="rounded-md border border-neutral-300 px-4 py-2">
+    <label for="filtroTipo" class="sr-only">Tipo</label>
+    <select id="filtroTipo" onchange="aplicarFiltros()" class="rounded-md border border-neutral-300 px-4 py-2">
+      <option value="">Todos los tipos</option>
+      <option value="impregnado">Impregnado</option>
+      <option value="estandar">Estándar</option>
+      <option value="lena">Leña</option>
+    </select>
+    <label for="filtroCategoria" class="sr-only">Categoría</label>
+    <select id="filtroCategoria" onchange="aplicarFiltros()" class="rounded-md border border-neutral-300 px-4 py-2">
+      <option value="">Todas las categorías</option>
+      <option value="industrial">Industrial</option>
+      <option value="construccion">Construcción</option>
+      <option value="agricola">Agrícola</option>
+      <option value="lena">Leña en saco</option>
+    </select>
+  </form>
+  <p id="productosResumen" class="mb-4 text-sm text-neutral-500" aria-live="polite"></p>
+  <div id="productosGrid" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"></div>
+</section>

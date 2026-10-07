@@ -3,364 +3,121 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>El Galpón del Polín - Venta de Polines</title>
-  <link rel="stylesheet" href="src/styles/styles.css">
+  <title>Agroforestal Monte Redondo SPA - Polines y Leña</title>
+  <meta name="description" content="Polines impregnados y leña seca en saco. Reserva en línea y retira en nuestro galpón.">
+  <meta name="theme-color" content="#2D5F3F">
+
+  <!-- Vista previa al compartir el enlace (WhatsApp, Facebook, etc.).
+       Al publicar, cambiar las rutas por la URL completa del sitio (ej: https://dominio.cl/src/img/logo.png). -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Agroforestal Monte Redondo SPA">
+  <meta property="og:title" content="Agroforestal Monte Redondo SPA - Polines y Leña">
+  <meta property="og:description" content="Polines impregnados y leña seca en saco. Reserva en línea y retira en nuestro galpón.">
+  <meta property="og:image" content="src/img/logo.png">
+  <meta property="og:locale" content="es_CL">
+  <meta name="twitter:card" content="summary">
+
+  <link rel="icon" type="image/png" href="src/img/favicon.png">
+  <!-- Generado con `npm run css` desde src/css/entrada.css -->
+  <link rel="stylesheet" href="src/css/estilos.css?v=2026-10-08">
 </head>
-<body>
-  <!-- Navbar -->
-  <nav class="navbar">
-    <div class="navbar-container">
-      <div class="navbar-logo">
-        <span class="logo-icon">📦</span>
-        <span>El Galpón del Polín</span>
-      </div>
-      <ul class="nav-menu">
-        <li><a href="#" onclick="cambiarVista('inicio')">Inicio</a></li>
-        <li><a href="#" onclick="cambiarVista('productos')">Productos</a></li>
-        <li class="carrito-link">
-          <a href="#" onclick="cambiarVista('carrito')">
-            Carrito <span class="carrito-contador" id="carritoContador">0</span>
+<body class="text-neutral-900">
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[300] focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:font-bold focus:text-bosque">Saltar al contenido</a>
+
+  <!-- Menú: los enlaces son rutas (#/productos) que maneja src/js/navegacion.js -->
+  <nav class="sticky top-0 z-50 bg-bosque text-white shadow-md" aria-label="Menú principal">
+    <div class="relative mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+      <a href="#/inicio" class="flex shrink-0 items-center gap-3 text-lg font-bold">
+        <img src="src/img/logo.png" alt="" class="h-11 w-11 rounded-lg bg-black p-1 shadow">
+        <span class="hidden whitespace-nowrap sm:inline">Agroforestal Monte Redondo SPA</span>
+        <span class="sm:hidden">Monte Redondo</span>
+      </a>
+
+      <button id="btnMenu" type="button" onclick="alternarMenu()" aria-controls="menuPrincipal" aria-expanded="false"
+              class="rounded-md p-2 hover:bg-white/10 lg:hidden">
+        <span class="sr-only">Abrir menú</span>
+        <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+
+      <ul id="menuPrincipal"
+          class="absolute inset-x-0 top-full hidden flex-col gap-1 border-t border-white/10 bg-bosque px-4 pb-4 pt-2 text-base font-medium shadow-lg lg:static lg:flex lg:flex-row lg:items-center lg:gap-1 lg:border-0 lg:p-0 lg:shadow-none">
+        <li><a href="#/inicio" data-ruta="inicio" class="enlace-menu block whitespace-nowrap rounded px-3 py-2 hover:bg-white/10">Inicio</a></li>
+        <li><a href="#/productos" data-ruta="productos" class="enlace-menu block whitespace-nowrap rounded px-3 py-2 hover:bg-white/10">Productos</a></li>
+        <li>
+          <a href="#/carrito" data-ruta="carrito" class="enlace-menu flex items-center whitespace-nowrap rounded px-3 py-2 hover:bg-white/10">
+            Carrito
+            <span id="carritoContador" class="ml-1 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-madera px-1 text-xs font-bold" aria-label="productos en el carrito">0</span>
           </a>
         </li>
-        <li id="menuDashboard" style="display:none;">
-          <a href="#" onclick="cambiarVista('dashboard')">Dashboard</a>
+        <li data-solo="sesion" class="hidden"><a href="#/mis-reservas" data-ruta="mis-reservas" class="enlace-menu block whitespace-nowrap rounded px-3 py-2 hover:bg-white/10">Mis reservas</a></li>
+        <li data-solo="sesion" class="hidden"><a href="#/perfil" data-ruta="perfil" class="enlace-menu block whitespace-nowrap rounded px-3 py-2 hover:bg-white/10">Mi perfil</a></li>
+        <li data-solo="admin" class="hidden"><a href="#/admin" data-ruta="admin" class="enlace-menu block whitespace-nowrap rounded px-3 py-2 hover:bg-white/10">Administrador</a></li>
+        <li data-solo="visitante" class="lg:ml-2">
+          <a href="#/login" class="block rounded bg-madera px-4 py-2 text-center font-bold hover:bg-madera-claro">Iniciar sesión</a>
         </li>
-        <li id="menuMisReservas" style="display:none;">
-          <a href="#" onclick="cambiarVista('mis-reservas')">Mis Reservas</a>
-        </li>
-        <li id="menuPerfil" style="display:none;">
-          <a href="#" onclick="cambiarVista('perfil')">Perfil</a>
-        </li>
-        <li id="menuAdmin" style="display:none;">
-          <a href="#" onclick="cambiarVista('admin')">Administrador</a>
-        </li>
-        <li id="btnLogin">
-          <a href="#" onclick="cambiarVista('login')" class="btn-login">Iniciar Sesión</a>
-        </li>
-        <li id="btnLogout" style="display:none;">
-          <a href="#" onclick="cerrarSesion()" class="btn-logout">Cerrar Sesión</a>
+        <li data-solo="sesion" class="hidden lg:ml-2">
+          <button type="button" onclick="cerrarSesion()" class="w-full whitespace-nowrap rounded bg-madera px-4 py-2 font-bold hover:bg-madera-claro">
+            Salir <span id="navNombreUsuario" class="font-normal text-white/80"></span>
+          </button>
         </li>
       </ul>
     </div>
   </nav>
 
-  <!-- Main Content -->
-  <main class="main-content">
-
-    <!-- Sección: Inicio -->
-    <section id="seccion-inicio" class="vista-activa">
-      <div class="hero">
-        <div class="hero-content">
-          <h1>El Galpón del Polín</h1>
-          <p>Venta especializada de polines de calidad industrial y estándar</p>
-          <button class="btn-primario" onclick="cambiarVista('productos')">Ver Catálogo</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- Sección: Login -->
-    <section id="seccion-login" class="contenedor">
-      <div class="auth-container">
-        <div class="auth-box">
-          <h2>Iniciar Sesión</h2>
-          <form id="formLogin" onsubmit="handleLogin(event)">
-            <div class="form-group">
-              <label for="loginEmail">Email:</label>
-              <input type="email" id="loginEmail" required>
-            </div>
-            <div class="form-group">
-              <label for="loginPassword">Contraseña:</label>
-              <input type="password" id="loginPassword" required>
-            </div>
-            <button type="submit" class="btn-primario">Iniciar Sesión</button>
-            <p class="texto-cambio">¿No tienes cuenta? <a href="#" onclick="cambiarVista('registro')">Registrarse</a></p>
-          </form>
-          <div id="loginError" class="error-message"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Sección: Registro -->
-    <section id="seccion-registro" class="contenedor">
-      <div class="auth-container">
-        <div class="auth-box">
-          <h2>Crear Cuenta</h2>
-          <form id="formRegistro" onsubmit="handleRegistro(event)">
-            <div class="form-group">
-              <label for="regNombre">Nombre:</label>
-              <input type="text" id="regNombre" required>
-            </div>
-            <div class="form-group">
-              <label for="regEmail">Email:</label>
-              <input type="email" id="regEmail" required>
-            </div>
-            <div class="form-group">
-              <label for="regPassword">Contraseña:</label>
-              <input type="password" id="regPassword" required>
-            </div>
-            <div class="form-group">
-              <label for="regConfirm">Confirmar Contraseña:</label>
-              <input type="password" id="regConfirm" required>
-            </div>
-            <button type="submit" class="btn-primario">Registrarse</button>
-            <p class="texto-cambio">¿Ya tienes cuenta? <a href="#" onclick="cambiarVista('login')">Iniciar Sesión</a></p>
-          </form>
-          <div id="regError" class="error-message"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Sección: Productos -->
-    <section id="seccion-productos" class="contenedor">
-      <h2>Catálogo de Productos</h2>
-      <div class="filtros">
-        <select id="filtroTipo" onchange="aplicarFiltros()">
-          <option value="">Todos los tipos</option>
-          <option value="impregnado">Impregnado</option>
-          <option value="estandar">Estándar</option>
-        </select>
-        <select id="filtroCategoria" onchange="aplicarFiltros()">
-          <option value="">Todas las categorías</option>
-          <option value="industrial">Industrial</option>
-          <option value="construccion">Construcción</option>
-          <option value="agricola">Agrícola</option>
-        </select>
-      </div>
-      <div id="productosGrid" class="productos-grid">
-        <!-- Los productos se cargarán aquí -->
-      </div>
-    </section>
-
-    <!-- Sección: Dashboard -->
-    <section id="seccion-dashboard" class="contenedor" style="display:none;">
-      <h2>Dashboard</h2>
-      <div id="dashboardStats" class="dashboard-stats"></div>
-    </section>
-
-    <!-- Sección: Mis Reservas -->
-    <section id="seccion-mis-reservas" class="contenedor" style="display:none;">
-      <h2>Mis Reservas</h2>
-      <div class="filtros">
-        <input id="busquedaCodigo" type="text" placeholder="Buscar por código de reserva...">
-        <button class="btn-primario" onclick="buscarReservaPorCodigo()">Buscar</button>
-      </div>
-      <div id="misReservasResultados"></div>
-    </section>
-
-    <!-- Sección: Carrito -->
-    <section id="seccion-carrito" class="contenedor">
-      <h2>Carrito de Compras</h2>
-      <div id="carritoVacio" class="carrito-vacio">
-        <p>Tu carrito está vacío</p>
-        <button class="btn-primario" onclick="cambiarVista('productos')">Continuar Comprando</button>
-      </div>
-      <div id="carritoContenido" style="display:none;">
-        <table class="carrito-tabla">
-          <thead>
-            <tr>
-              <th>Producto</th>
-              <th>Precio</th>
-              <th>Cantidad</th>
-              <th>Subtotal</th>
-              <th>Acción</th>
-            </tr>
-          </thead>
-          <tbody id="carritoItems"></tbody>
-        </table>
-        <div class="carrito-total">
-          <h3>Total: $<span id="carritoTotal">0</span></h3>
-        </div>
-        <div class="carrito-acciones">
-          <button class="btn-secundario" onclick="cambiarVista('productos')">Seguir Comprando</button>
-          <button class="btn-primario" onclick="cambiarVista('checkout')">Finalizar Compra</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- Sección: Checkout -->
-    <section id="seccion-checkout" class="contenedor">
-      <h2>Finalizar Compra</h2>
-      <form id="formCheckout" onsubmit="handleCompra(event)">
-        <div class="checkout-grid">
-          <div class="checkout-seccion">
-            <h3>Resumen del Pedido</h3>
-            <div id="resumenPedido"></div>
-          </div>
-          <div class="checkout-seccion">
-            <h3>Dirección de Entrega</h3>
-            <div class="form-group">
-              <label>Calle:</label>
-              <input type="text" id="checkoutCalle" required>
-            </div>
-            <div class="form-group">
-              <label>Número:</label>
-              <input type="text" id="checkoutNumero" required>
-            </div>
-            <div class="form-group">
-              <label>Ciudad:</label>
-              <input type="text" id="checkoutCiudad" required>
-            </div>
-            <div class="form-group">
-              <label>Código Postal:</label>
-              <input type="text" id="checkoutCP" required>
-            </div>
-            <h3>Método de Pago</h3>
-            <div class="form-group">
-              <label>
-                <input type="radio" name="metodoPago" value="efectivo" checked> Efectivo
-              </label>
-              <label>
-                <input type="radio" name="metodoPago" value="tarjeta"> Tarjeta de Crédito
-              </label>
-              <label>
-                <input type="radio" name="metodoPago" value="transferencia"> Transferencia Bancaria
-              </label>
-            </div>
-            <button type="submit" class="btn-primario">Completar Pedido</button>
-          </div>
-        </div>
-      </form>
-      <div id="checkoutError" class="error-message"></div>
-    </section>
-
-    <!-- Sección: Perfil -->
-    <section id="seccion-perfil" class="contenedor">
-      <h2>Mi Perfil</h2>
-      <div class="perfil-container">
-        <div class="perfil-seccion">
-          <h3>Información Personal</h3>
-          <form id="formPerfil" onsubmit="handleActualizarPerfil(event)">
-            <div class="form-group">
-              <label>Nombre:</label>
-              <input type="text" id="perfilNombre">
-            </div>
-            <div class="form-group">
-              <label>Email:</label>
-              <input type="email" id="perfilEmail" disabled>
-            </div>
-            <div class="form-group">
-              <label>Teléfono:</label>
-              <input type="tel" id="perfilTelefono">
-            </div>
-            <div class="form-group">
-              <label>Dirección:</label>
-              <input type="text" id="perfilDireccion">
-            </div>
-            <div class="form-group">
-              <label>Ciudad:</label>
-              <input type="text" id="perfilCiudad">
-            </div>
-            <button type="submit" class="btn-primario">Guardar Cambios</button>
-          </form>
-        </div>
-        <div class="perfil-seccion">
-          <h3>Mis Pedidos</h3>
-          <div id="misPedidos"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Sección: Administrador -->
-    <section id="seccion-admin" class="contenedor">
-      <h2>Panel de Administrador</h2>
-      <div class="admin-tabs">
-        <button class="tab-btn active" onclick="cambiarTab('admin-productos')">Productos</button>
-        <button class="tab-btn" onclick="cambiarTab('admin-pedidos')">Pedidos</button>
-        <button class="tab-btn" onclick="cambiarTab('admin-usuarios')">Usuarios</button>
-      </div>
-
-      <!-- Tab: Productos -->
-      <div id="admin-productos" class="admin-tab-content">
-        <h3>Gestionar Productos</h3>
-        <button class="btn-primario" onclick="mostrarFormNuevoProducto()">Nuevo Producto</button>
-        <form id="formNuevoProducto" style="display:none;" onsubmit="handleNuevoProducto(event)">
-          <div class="form-group">
-            <label>Nombre:</label>
-            <input type="text" id="adminProdNombre" required>
-          </div>
-          <div class="form-group">
-            <label>Descripción:</label>
-            <textarea id="adminProdDesc" required></textarea>
-          </div>
-          <div class="form-group">
-            <label>Precio:</label>
-            <input type="number" id="adminProdPrecio" step="0.01" required>
-          </div>
-          <div class="form-group">
-            <label>Stock:</label>
-            <input type="number" id="adminProdStock" required>
-          </div>
-          <div class="form-group">
-            <label>Tipo:</label>
-            <select id="adminProdTipo" required>
-              <option value="estandar">Estándar</option>
-              <option value="impregnado">Impregnado</option>
-            </select>
-          </div>
-          <button type="submit" class="btn-primario">Crear Producto</button>
-          <button type="button" class="btn-secundario" onclick="cancelarFormProducto()">Cancelar</button>
-        </form>
-        <table class="admin-tabla">
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Precio</th>
-              <th>Stock</th>
-              <th>Tipo</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="adminProductosTable"></tbody>
-        </table>
-      </div>
-
-      <!-- Tab: Pedidos -->
-      <div id="admin-pedidos" class="admin-tab-content" style="display:none;">
-        <h3>Gestionar Pedidos</h3>
-        <table class="admin-tabla">
-          <thead>
-            <tr>
-              <th>Número de Orden</th>
-              <th>Cliente</th>
-              <th>Total</th>
-              <th>Estado</th>
-              <th>Fecha</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="adminPedidosTable"></tbody>
-        </table>
-      </div>
-
-      <!-- Tab: Usuarios -->
-      <div id="admin-usuarios" class="admin-tab-content" style="display:none;">
-        <h3>Gestionar Usuarios</h3>
-        <table class="admin-tabla">
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Email</th>
-              <th>Rol</th>
-              <th>Estado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="adminUsuariosTable"></tbody>
-        </table>
-      </div>
-    </section>
-
+  <!-- Contenido: cada vista se carga desde src/sections/ (ver src/js/cargarSecciones.js) -->
+  <main id="main-content" tabindex="-1" class="mx-auto max-w-6xl space-y-16 px-4 py-10 focus:outline-none">
+    <p class="text-center text-white/80">Cargando...</p>
   </main>
 
-  <!-- Modal para detalles -->
-  <div id="modal" class="modal">
-    <div class="modal-contenido">
-      <span class="modal-cerrar" onclick="cerrarModal()">&times;</span>
+  <!-- Footer -->
+  <footer class="relative mt-20 overflow-hidden bg-bosque-noche text-white">
+    <div class="bosque-capa-frente absolute inset-x-0 top-0 h-20 -scale-y-100 opacity-90"></div>
+    <div class="relative px-6 pb-10 pt-24 text-center">
+      <img src="src/img/logo.png" alt="" class="mx-auto mb-4 h-16 w-16">
+      <p class="mb-3 text-xl font-bold">Agroforestal Monte Redondo SPA</p>
+      <p class="mx-auto mb-4 max-w-md text-sm text-white/70">Polines impregnados y leña en saco para el campo, la construcción y el hogar.</p>
+      <p id="footerDireccion" class="mx-auto mb-6 max-w-md text-sm text-white/70"></p>
+      <div class="flex flex-wrap justify-center gap-6 text-sm">
+        <a href="#/inicio" class="hover:text-madera-claro">Inicio</a>
+        <a href="#/productos" class="hover:text-madera-claro">Productos</a>
+        <a href="#/carrito" class="hover:text-madera-claro">Carrito</a>
+      </div>
+      <p class="mt-8 text-xs text-white/40">© 2026 Agroforestal Monte Redondo SPA</p>
+    </div>
+  </footer>
+
+  <!-- Botón flotante de WhatsApp (se muestra solo si hay número configurado) -->
+  <a id="btnWhatsappFlotante" href="#" target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp"
+     class="fixed bottom-5 right-5 z-50 hidden h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-xl transition hover:scale-110">
+    <svg viewBox="0 0 32 32" class="h-8 w-8" fill="currentColor" aria-hidden="true"><path d="M16.04 3C9.4 3 4 8.36 4 14.97c0 2.11.56 4.17 1.62 5.99L4 29l8.25-1.58a12.1 12.1 0 0 0 3.79.6C22.68 28.02 28 22.66 28 16.05 28 9.44 22.68 3 16.04 3zm0 22.82c-1.24 0-2.46-.22-3.6-.65l-.26-.1-4.9.94.97-4.75-.17-.28a9.72 9.72 0 0 1-1.5-5.2c0-5.4 4.42-9.79 9.86-9.79 5.43 0 9.75 4.39 9.75 9.98 0 5.45-4.36 9.85-10.15 9.85zm5.4-7.32c-.3-.15-1.75-.86-2.02-.96-.27-.1-.47-.15-.67.15-.2.3-.77.96-.94 1.16-.17.2-.35.22-.64.07-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.47-1.75-1.65-2.04-.17-.3-.02-.46.13-.6.13-.14.3-.35.44-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.6-.92-2.2-.24-.57-.48-.5-.67-.5h-.57c-.2 0-.52.08-.79.37-.27.3-1.04 1.01-1.04 2.46 0 1.45 1.06 2.86 1.21 3.05.15.2 2.09 3.18 5.06 4.46.71.3 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.08 1.75-.71 2-1.4.25-.7.25-1.29.17-1.41-.07-.12-.27-.2-.57-.35z"/></svg>
+  </a>
+
+  <!-- Ventana modal (detalles de reserva, formularios del admin). Se cierra con Esc o clic afuera. -->
+  <div id="modal" class="fixed inset-0 z-[100] hidden overflow-y-auto bg-black/40 p-4" onclick="if (event.target === this) cerrarModal()">
+    <div role="dialog" aria-modal="true" aria-labelledby="modalTitulo" class="relative mx-auto mt-10 w-full max-w-lg rounded-lg bg-white p-6 shadow-2xl sm:p-8">
+      <button type="button" onclick="cerrarModal()" aria-label="Cerrar"
+              class="absolute right-3 top-3 rounded-md px-2 text-2xl font-bold leading-none text-neutral-400 hover:text-neutral-900">&times;</button>
       <div id="modalBody"></div>
     </div>
   </div>
 
-  <!-- Script -->
-  <script src="src/js/app.js"></script>
+  <!-- Avisos flotantes; aria-live hace que los lectores de pantalla los anuncien -->
+  <div id="avisos" class="fixed right-4 top-20 z-[200] flex w-[calc(100%-2rem)] max-w-xs flex-col gap-2" role="status" aria-live="polite"></div>
+
+  <!-- Scripts: comparten variables globales, por eso el orden importa. El ?v= obliga a
+       bajar la versión nueva; debe coincidir con VERSION_DATOS en src/js/config.js. -->
+  <script src="src/js/config.js?v=2026-10-08"></script>
+  <script src="src/js/utilidades.js?v=2026-10-08"></script>
+  <script src="src/js/cargarSecciones.js?v=2026-10-08"></script>
+  <script src="src/js/negocio.js?v=2026-10-08"></script>
+  <script src="src/js/sesion.js?v=2026-10-08"></script>
+  <script src="src/js/catalogo.js?v=2026-10-08"></script>
+  <script src="src/js/carrito.js?v=2026-10-08"></script>
+  <script src="src/js/cuenta.js?v=2026-10-08"></script>
+  <script src="src/js/admin.js?v=2026-10-08"></script>
+  <script src="src/js/navegacion.js?v=2026-10-08"></script>
+  <script src="src/js/app.js?v=2026-10-08"></script>
 </body>
 </html>

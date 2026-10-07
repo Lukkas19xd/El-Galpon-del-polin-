@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# Script de Instalación - El Galpón del Polín
+# Script de Instalación - Agroforestal Monte Redondo SPA
 # Este script automatiza la instalación del proyecto
 
 echo "=================================="
-echo "🚀 El Galpón del Polín - Instalación"
+echo "🚀 Agroforestal Monte Redondo SPA - Instalación"
 echo "=================================="
 echo ""
 
@@ -43,10 +43,10 @@ if ! command -v npm &> /dev/null; then
 fi
 print_success "npm instalado: $(npm -v)"
 
-# Verificar MongoDB (solo advertencia)
-if ! command -v mongod &> /dev/null; then
-    print_info "MongoDB no se detectó en PATH"
-    print_info "Asegúrate de que MongoDB esté corriendo en tu sistema"
+# Verificar Docker (solo advertencia, se usa para levantar PostgreSQL)
+if ! command -v docker &> /dev/null; then
+    print_info "Docker no se detectó en PATH"
+    print_info "Necesitás Docker (o un PostgreSQL propio) para levantar la base de datos"
 fi
 
 echo ""
@@ -88,8 +88,8 @@ echo "=================================="
 echo ""
 echo "Próximos pasos:"
 echo ""
-echo "1. Inicia MongoDB en una terminal:"
-echo "   mongod"
+echo "1. Levanta PostgreSQL con Docker:"
+echo "   cd backend && docker compose up -d"
 echo ""
 echo "2. (Opcional) Inicializa la base de datos con datos de ejemplo:"
 echo "   cd backend && npm run seed"

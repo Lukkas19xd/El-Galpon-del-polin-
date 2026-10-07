@@ -1,7 +1,7 @@
 {
-  "name": "el-galpon-del-polin-backend",
+  "name": "agroforestal-monte-redondo-backend",
   "version": "1.0.0",
-  "description": "Backend API REST para El Galpón del Polín - Venta de polines",
+  "description": "Backend API REST para Agroforestal Monte Redondo SPA - Venta de polines y leña",
   "main": "src/index.js",
   "type": "module",
   "scripts": {
@@ -17,17 +17,19 @@
     "api",
     "express"
   ],
-  "author": "El Galpón del Polín",
+  "author": "Agroforestal Monte Redondo SPA",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "express-rate-limit": "^8.7.1",
     "express-validator": "^7.0.0",
+    "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.0",
-    "uuid": "^9.0.0"
+    "nodemailer": "^10.0.15",
+    "pg": "^8.11.3"
   },
   "devDependencies": {
     "jest": "^29.6.1",

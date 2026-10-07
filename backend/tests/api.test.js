@@ -1,6 +1,9 @@
 import request from 'supertest';
-import app from '../src/index.js';
+import app from '../src/app.js';
 import Producto from '../src/models/Producto.js';
+import { pool } from '../src/db.js';
+
+afterAll(() => pool.end());
 
 describe('Rutas de Autenticación', () => {
   let token;

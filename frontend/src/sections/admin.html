@@ -1,0 +1,82 @@
+<section id="seccion-admin" class="hidden">
+  <h2 class="mb-6 border-b-4 border-madera pb-4 text-2xl font-bold text-bosque">Panel de administrador</h2>
+  <div class="mb-8 flex flex-wrap gap-0 border-b-2 border-neutral-200" role="tablist" aria-label="Secciones del panel">
+    <button type="button" role="tab" aria-selected="true" aria-controls="admin-retiros" class="tab-btn border-b-2 border-madera px-5 py-3 font-bold text-madera" onclick="cambiarTab('admin-retiros', this)">Retiros</button>
+    <button type="button" role="tab" aria-selected="false" aria-controls="admin-productos" class="tab-btn border-b-2 border-transparent px-5 py-3 font-bold text-neutral-600 hover:bg-neutral-100" onclick="cambiarTab('admin-productos', this)">Productos</button>
+    <button type="button" role="tab" aria-selected="false" aria-controls="admin-pedidos" class="tab-btn border-b-2 border-transparent px-5 py-3 font-bold text-neutral-600 hover:bg-neutral-100" onclick="cambiarTab('admin-pedidos', this)">Reservas</button>
+    <button type="button" role="tab" aria-selected="false" aria-controls="admin-usuarios" class="tab-btn border-b-2 border-transparent px-5 py-3 font-bold text-neutral-600 hover:bg-neutral-100" onclick="cambiarTab('admin-usuarios', this)">Usuarios</button>
+  </div>
+
+  <!-- Tab: Retiros (reservas activas agrupadas por fecha de retiro) -->
+  <div id="admin-retiros" role="tabpanel" class="admin-tab-content rounded-md bg-neutral-50 p-4 sm:p-6">
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+      <h3 class="text-lg font-bold text-bosque">Próximos retiros</h3>
+      <button type="button" class="rounded-md border border-bosque px-4 py-2 text-sm font-bold text-bosque hover:bg-bosque hover:text-white" onclick="cargarRetirosAdmin()">↻ Actualizar</button>
+    </div>
+    <div id="adminRetiros" class="space-y-6"></div>
+  </div>
+
+  <!-- Tab: Productos -->
+  <div id="admin-productos" role="tabpanel" class="admin-tab-content hidden rounded-md bg-neutral-50 p-4 sm:p-6">
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+      <h3 class="text-lg font-bold text-bosque">Productos</h3>
+      <button type="button" class="rounded-md bg-madera px-5 py-2 font-bold text-white shadow hover:bg-madera-claro" onclick="abrirFormProducto()">+ Nuevo producto</button>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse text-sm">
+        <thead>
+          <tr class="bg-bosque text-left font-bold text-white">
+            <th class="p-3">Nombre</th>
+            <th class="p-3">Precio</th>
+            <th class="p-3">Stock</th>
+            <th class="p-3">Categoría</th>
+            <th class="p-3">Estado</th>
+            <th class="p-3"><span class="sr-only">Acciones</span></th>
+          </tr>
+        </thead>
+        <tbody id="adminProductosTable" class="divide-y divide-neutral-200 bg-white"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Tab: Reservas (todas, incluidas las cerradas) -->
+  <div id="admin-pedidos" role="tabpanel" class="admin-tab-content hidden rounded-md bg-neutral-50 p-4 sm:p-6">
+    <h3 class="mb-4 text-lg font-bold text-bosque">Últimas reservas</h3>
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse text-sm">
+        <thead>
+          <tr class="bg-bosque text-left font-bold text-white">
+            <th class="p-3">Código</th>
+            <th class="p-3">Cliente</th>
+            <th class="p-3">Total</th>
+            <th class="p-3">Estado</th>
+            <th class="p-3">Creada</th>
+            <th class="p-3">Retiro</th>
+            <th class="p-3"><span class="sr-only">Acciones</span></th>
+          </tr>
+        </thead>
+        <tbody id="adminPedidosTable" class="divide-y divide-neutral-200 bg-white"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Tab: Usuarios -->
+  <div id="admin-usuarios" role="tabpanel" class="admin-tab-content hidden rounded-md bg-neutral-50 p-4 sm:p-6">
+    <h3 class="mb-4 text-lg font-bold text-bosque">Usuarios</h3>
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse text-sm">
+        <thead>
+          <tr class="bg-bosque text-left font-bold text-white">
+            <th class="p-3">Nombre</th>
+            <th class="p-3">Email</th>
+            <th class="p-3">Teléfono</th>
+            <th class="p-3">Rol</th>
+            <th class="p-3">Estado</th>
+            <th class="p-3"><span class="sr-only">Acciones</span></th>
+          </tr>
+        </thead>
+        <tbody id="adminUsuariosTable" class="divide-y divide-neutral-200 bg-white"></tbody>
+      </table>
+    </div>
+  </div>
+</section>

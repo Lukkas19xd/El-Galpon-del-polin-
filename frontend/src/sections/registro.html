@@ -1,0 +1,34 @@
+<section id="seccion-registro" class="hidden">
+  <div class="flex min-h-[28rem] items-center justify-center">
+    <div class="w-full max-w-sm rounded-lg border-t-4 border-bosque bg-white p-8 shadow-md">
+      <h2 class="mb-6 text-2xl font-bold text-bosque">Crear cuenta</h2>
+      <form id="formRegistro" onsubmit="handleRegistro(event)" class="space-y-5">
+        <div>
+          <label for="regNombre" class="mb-1 block text-sm font-semibold text-neutral-700">Nombre</label>
+          <input type="text" id="regNombre" required maxlength="100" autocomplete="name" class="w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-bosque focus:outline-none focus:ring-2 focus:ring-bosque/20">
+        </div>
+        <div>
+          <label for="regEmail" class="mb-1 block text-sm font-semibold text-neutral-700">Email</label>
+          <input type="email" id="regEmail" required autocomplete="email" class="w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-bosque focus:outline-none focus:ring-2 focus:ring-bosque/20">
+        </div>
+        <div>
+          <label for="regTelefono" class="mb-1 block text-sm font-semibold text-neutral-700">Teléfono</label>
+          <input type="tel" id="regTelefono" required autocomplete="tel" placeholder="+56 9 1234 5678" pattern="[0-9+\s\(\)\-]{6,20}"
+                 class="w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-bosque focus:outline-none focus:ring-2 focus:ring-bosque/20">
+          <p class="mt-1 text-xs text-neutral-500">Para avisarte si hay algún problema con tu reserva.</p>
+        </div>
+        <div>
+          <label for="regPassword" class="mb-1 block text-sm font-semibold text-neutral-700">Contraseña</label>
+          <input type="password" id="regPassword" required minlength="8" autocomplete="new-password" placeholder="Mínimo 8 caracteres" class="w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-bosque focus:outline-none focus:ring-2 focus:ring-bosque/20">
+        </div>
+        <div>
+          <label for="regConfirm" class="mb-1 block text-sm font-semibold text-neutral-700">Confirmar contraseña</label>
+          <input type="password" id="regConfirm" required minlength="8" autocomplete="new-password" class="w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-bosque focus:outline-none focus:ring-2 focus:ring-bosque/20">
+        </div>
+        <button type="submit" class="w-full rounded-md bg-madera px-6 py-3 font-bold text-white shadow transition hover:-translate-y-0.5 hover:bg-madera-claro disabled:cursor-wait disabled:opacity-60">Registrarme</button>
+        <p class="text-center text-sm">¿Ya tienes cuenta? <a href="#/login" class="font-bold text-madera underline-offset-2 hover:underline">Inicia sesión</a></p>
+      </form>
+      <div id="regError" class="hidden mt-4 rounded-md bg-red-50 px-4 py-3 text-sm font-semibold text-red-700" role="alert"></div>
+    </div>
+  </div>
+</section>

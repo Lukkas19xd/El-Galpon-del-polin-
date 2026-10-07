@@ -1,0 +1,10 @@
+<section id="seccion-mis-reservas" class="hidden">
+  <h2 class="mb-6 border-b-4 border-madera pb-4 text-2xl font-bold text-bosque">Mis reservas</h2>
+  <div id="misReservasResumen" class="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4"></div>
+  <form class="mb-6 flex flex-wrap gap-3" role="search" onsubmit="event.preventDefault(); buscarReservaPorCodigo()">
+    <label for="busquedaCodigo" class="sr-only">Código de reserva</label>
+    <input id="busquedaCodigo" type="search" placeholder="Buscar por código, ej: RES-HRMFBU" class="min-w-[14rem] flex-1 rounded-md border border-neutral-300 px-4 py-2 uppercase">
+    <button type="submit" class="rounded-md bg-madera px-6 py-2 font-bold text-white shadow hover:bg-madera-claro">Buscar</button>
+  </form>
+  <div id="misReservasLista" class="space-y-4"></div>
+</section>

@@ -1,605 +1,390 @@
-# 📚 Documentación de Endpoints API
+# 📚 Documentación de la API
 
-Base URL: `http://localhost:3000/api`
+API REST de Agroforestal Monte Redondo SPA: catálogo de polines y leña en saco,
+carrito y **reservas con retiro en el galpón** (no hay pago en línea: el cliente
+paga al retirar).
 
-Todos los endpoints que requieren autenticación necesitan el header:
+- Base URL en desarrollo: `http://localhost:3000/api`
+- En producción el backend sirve también el frontend, así que la API queda en `https://<dominio>/api`.
+
+Los endpoints protegidos necesitan el header:
+
 ```
 Authorization: Bearer {token}
+```
+
+En cada petición se comprueba en la base de datos que la cuenta siga existiendo y
+activa, y el rol se toma de la base (no del token). Una cuenta desactivada pierde
+el acceso al instante.
+
+---
+
+## Formato de respuestas
+
+Éxito: `{ "success": true, ... }`
+
+Error (siempre el mismo formato):
+
+```json
+{
+  "success": false,
+  "statusCode": 400,
+  "message": "Email inválido.",
+  "detalles": [{ "campo": "email", "mensaje": "Email inválido." }]
+}
+```
+
+`detalles` solo viene en errores de validación. Con `NODE_ENV=development` los errores
+500 incluyen además `stack`; en producción solo dicen "Error interno del servidor".
+
+| Código | Cuándo |
+|---|---|
+| 400 | Datos inválidos, JSON mal formado, transición de estado no permitida |
+| 401 | Sin token, token inválido/expirado o credenciales incorrectas |
+| 403 | Sin permisos (no es admin) o cuenta desactivada |
+| 404 | No existe (incluye ids con formato inválido y reservas de otro cliente) |
+| 409 | Email ya registrado, stock insuficiente, producto no disponible, demasiadas reservas activas |
+| 429 | Se superó un límite de peticiones (ver abajo) |
+
+## Límites de peticiones
+
+| Qué | Límite |
+|---|---|
+| Toda la API | 500 peticiones cada 15 min por IP |
+| `POST /auth/login` | 10 intentos **fallidos** cada 15 min por IP |
+| `PUT /auth/cambiar-contrasena` | 10 intentos fallidos cada 15 min por IP |
+| `POST /auth/registro` | 5 cada hora por IP |
+| `POST /pedidos` | 10 reservas cada hora por usuario |
+
+Las respuestas incluyen la cabecera estándar `RateLimit` con lo que queda disponible.
+Si el servidor está detrás de un proxy, configura `TRUST_PROXY=1` para que se use la IP real.
+
+---
+
+## 🏪 Negocio
+
+### Datos del negocio
+```http
+GET /negocio
+```
+Público. Devuelve lo que está en `backend/data/negocio.js`:
+
+```json
+{
+  "success": true,
+  "negocio": {
+    "nombre": "Agroforestal Monte Redondo SPA",
+    "direccion": "…",
+    "comuna": "…",
+    "ubicacionMaps": "",
+    "whatsapp": "56912345678",
+    "horario": [{ "dias": "Lunes a viernes", "horas": "08:30 – 18:00" }],
+    "diasRetiro": [1, 2, 3, 4, 5, 6],
+    "anticipacionMaximaDias": 30,
+    "maxReservasActivasPorCliente": 5
+  }
+}
+```
+
+`diasRetiro` usa 0 = domingo … 6 = sábado.
+
+### Salud
+```http
+GET /health
 ```
 
 ---
 
 ## 🔐 Autenticación (`/auth`)
 
-### Registro de Usuario
+### Registro
 ```http
 POST /auth/registro
-Content-Type: application/json
 
 {
   "nombre": "Juan Pérez",
   "email": "juan@example.com",
-  "contrasena": "password123",
-  "confirmacion": "password123"
-}
-
-Respuesta 201:
-{
-  "success": true,
-  "message": "Usuario registrado exitosamente",
-  "token": "eyJhbGciOiJIUzI1NiIs...",
-  "usuario": {
-    "id": "507f1f77bcf86cd799439011",
-    "nombre": "Juan Pérez",
-    "email": "juan@example.com",
-    "rol": "cliente"
-  }
+  "telefono": "+56 9 1234 5678",
+  "contrasena": "minimo8caracteres",
+  "confirmacion": "minimo8caracteres"
 }
 ```
+- Contraseña de al menos 8 caracteres; `confirmacion` debe coincidir.
+- `telefono` es opcional en la API (la página lo pide siempre).
+- Siempre crea un usuario con rol `cliente`.
+- **201** → `{ success, message, token, usuario: { id, nombre, email, rol } }`
+- **409** si el email ya está registrado.
 
 ### Login
 ```http
 POST /auth/login
-Content-Type: application/json
 
-{
-  "email": "juan@example.com",
-  "contrasena": "password123"
-}
-
-Respuesta 200:
-{
-  "success": true,
-  "message": "Login exitoso",
-  "token": "eyJhbGciOiJIUzI1NiIs...",
-  "usuario": {
-    "id": "507f1f77bcf86cd799439011",
-    "nombre": "Juan Pérez",
-    "email": "juan@example.com",
-    "rol": "cliente"
-  }
-}
+{ "email": "juan@example.com", "contrasena": "minimo8caracteres" }
 ```
+- **200** → `{ success, message, token, usuario: { id, nombre, email, rol } }`
+- **401** credenciales inválidas · **403** cuenta desactivada.
 
-### Obtener Perfil
+### Perfil
 ```http
-GET /auth/perfil
+GET /auth/perfil      (o GET /auth/me)
 Authorization: Bearer {token}
-
-Respuesta 200:
-{
-  "success": true,
-  "usuario": {
-    "_id": "507f1f77bcf86cd799439011",
-    "nombre": "Juan Pérez",
-    "email": "juan@example.com",
-    "rol": "cliente",
-    "telefono": "1234567890",
-    "direccion": "Calle Principal 123",
-    "ciudad": "Ciudad",
-    "estado": "activo",
-    "activo": true,
-    "createdAt": "2025-06-01T10:00:00Z",
-    "updatedAt": "2025-06-01T10:00:00Z"
-  }
-}
 ```
+**200** → `{ success, usuario }`. La respuesta nunca incluye la contraseña.
 
-### Actualizar Perfil
+### Actualizar perfil
 ```http
 PUT /auth/perfil
 Authorization: Bearer {token}
-Content-Type: application/json
 
-{
-  "nombre": "Juan Carlos Pérez",
-  "telefono": "9876543210",
-  "direccion": "Avenida Secundaria 456",
-  "ciudad": "Nueva Ciudad"
-}
-
-Respuesta 200:
-{
-  "success": true,
-  "message": "Perfil actualizado exitosamente",
-  "usuario": { ... }
-}
+{ "nombre": "Juan", "telefono": "+56 9 1234 5678", "direccion": "…", "ciudad": "…" }
 ```
+Todos los campos son opcionales. `telefono` acepta solo números, espacios y `+ ( ) -`.
 
-### Cambiar Contraseña
+### Cambiar contraseña
 ```http
 PUT /auth/cambiar-contrasena
 Authorization: Bearer {token}
-Content-Type: application/json
 
 {
-  "contrasenaActual": "password123",
-  "contrasenanueva": "newpassword456",
-  "confirmacion": "newpassword456"
-}
-
-Respuesta 200:
-{
-  "success": true,
-  "message": "Contraseña cambiada exitosamente"
+  "contrasenaActual": "…",
+  "contrasenanueva": "nuevaClave123",
+  "confirmacion": "nuevaClave123"
 }
 ```
 
-### Obtener Usuarios (Admin)
+### Listar usuarios (admin)
 ```http
 GET /auth/usuarios
-Authorization: Bearer {admin_token}
-
-Respuesta 200:
-{
-  "success": true,
-  "total": 5,
-  "usuarios": [
-    {
-      "_id": "507f1f77bcf86cd799439011",
-      "nombre": "Juan Pérez",
-      "email": "juan@example.com",
-      "rol": "cliente",
-      "estado": "activo",
-      ...
-    }
-  ]
-}
+Authorization: Bearer {token_admin}
 ```
+
+### Cambiar rol o activar/desactivar una cuenta (admin)
+```http
+PUT /auth/usuarios/:id
+Authorization: Bearer {token_admin}
+
+{ "rol": "cliente", "activo": false }
+```
+- Ambos campos son opcionales. `rol`: `cliente` | `administrador`.
+- Una cuenta desactivada pierde el acceso al instante.
+- **400** si el admin intenta quitarse el rol o desactivar su propia cuenta.
 
 ---
 
 ## 📦 Productos (`/productos`)
 
-### Obtener Todos los Productos
+Valores válidos:
+- `tipo`: `impregnado` | `estandar` | `lena`
+- `categoria`: `agricola` | `construccion` | `industrial` | `lena`
+
+### Listar productos activos
 ```http
-GET /productos?tipo=impregnado&categoria=industrial&pagina=1&limite=10
-
-Query Parameters:
-- tipo: "impregnado" | "estandar" (opcional)
-- categoria: "industrial" | "construccion" | "agricola" | "otro" (opcional)
-- pagina: número de página (default: 1)
-- limite: items por página (default: 10)
-
-Respuesta 200:
-{
-  "success": true,
-  "total": 25,
-  "paginas": 3,
-  "paginaActual": 1,
-  "productos": [
-    {
-      "_id": "507f1f77bcf86cd799439011",
-      "nombre": "Polín Impregnado 100x100mm",
-      "descripcion": "...",
-      "precio": 45.99,
-      "stock": 150,
-      "tipo": "impregnado",
-      "categoria": "industrial",
-      "especificaciones": {
-        "diametro": 100,
-        "largo": 2400,
-        "material": "Madera Impregnada",
-        "peso": 12.5
-      },
-      "ventasRealizadas": 25,
-      ...
-    }
-  ]
-}
+GET /productos?q=eucalipto&tipo=lena&categoria=lena&pagina=1&limite=10
 ```
+Público. `q` busca en el nombre y la descripción, sin distinguir mayúsculas.
+Ordenados por categoría y precio.
+**200** → `{ success, total, paginas, paginaActual, productos }`
 
-### Obtener Producto por ID
+### Listar todos los productos (admin)
 ```http
-GET /productos/{id}
-
-Respuesta 200:
-{
-  "success": true,
-  "producto": { ... }
-}
-
-Respuesta 404:
-{
-  "success": false,
-  "message": "Producto no encontrado"
-}
+GET /productos/admin/todos
+Authorization: Bearer {token_admin}
 ```
+Incluye los ocultos (`activo: false`), para poder editarlos y volver a mostrarlos.
 
-### Crear Producto (Admin)
+### Obtener un producto
+```http
+GET /productos/:id
+```
+**404** si no existe o el id no tiene formato válido.
+
+### Crear producto (admin)
 ```http
 POST /productos
-Authorization: Bearer {admin_token}
-Content-Type: application/json
+Authorization: Bearer {token_admin}
 
 {
-  "nombre": "Polín Nuevo",
-  "descripcion": "Descripción del producto",
-  "precio": 50.00,
-  "stock": 100,
-  "tipo": "impregnado",
-  "categoria": "industrial",
-  "especificaciones": {
-    "diametro": 100,
-    "largo": 2400,
-    "material": "Madera Impregnada",
-    "peso": 12.5
-  }
-}
-
-Respuesta 201:
-{
-  "success": true,
-  "message": "Producto creado exitosamente",
-  "producto": { ... }
+  "nombre": "Leña de eucalipto seca (saco)",
+  "descripcion": "…",
+  "precio": 4500,
+  "stock": 300,
+  "tipo": "lena",
+  "categoria": "lena",
+  "especificaciones": { "especie": "Eucalipto", "peso": "~20 kg" },
+  "imagen": "src/img/productos/lena-eucalipto.jpg"
 }
 ```
+`nombre`, `precio` (≥ 0), `stock` (entero ≥ 0), `tipo` y `categoria` son obligatorios.
+`imagen` (opcional) es una URL `https://…` o una ruta dentro de `src/img/` del frontend;
+al editar, `""` la quita.
 
-### Actualizar Producto (Admin)
+### Actualizar producto (admin)
 ```http
-PUT /productos/{id}
-Authorization: Bearer {admin_token}
-Content-Type: application/json
+PUT /productos/:id
+Authorization: Bearer {token_admin}
 
-{
-  "nombre": "Polín Actualizado",
-  "precio": 55.00,
-  "stock": 120,
-  ...
-}
-
-Respuesta 200:
-{
-  "success": true,
-  "message": "Producto actualizado exitosamente",
-  "producto": { ... }
-}
+{ "precio": 4800, "stock": 250, "activo": true }
 ```
+Mismas reglas que al crear, pero todos los campos son opcionales.
 
-### Eliminar Producto (Admin)
+### Desactivar producto (admin)
 ```http
-DELETE /productos/{id}
-Authorization: Bearer {admin_token}
-
-Respuesta 200:
-{
-  "success": true,
-  "message": "Producto eliminado exitosamente"
-}
+DELETE /productos/:id
+Authorization: Bearer {token_admin}
 ```
+No se borra: queda con `activo: false`, porque puede estar en reservas antiguas.
 
-### Validar Stock
+### Consultar stock
 ```http
 POST /productos/validar-stock
-Content-Type: application/json
 
-{
-  "productoId": "507f1f77bcf86cd799439011",
-  "cantidad": 10
-}
-
-Respuesta 200:
-{
-  "success": true,
-  "disponible": true,
-  "stockActual": 150,
-  "solicitado": 10
-}
-
-O si no hay stock:
-{
-  "success": true,
-  "disponible": false,
-  "stockActual": 5,
-  "solicitado": 10,
-  "message": "Stock insuficiente"
-}
+{ "productoId": "uuid", "cantidad": 5 }
 ```
+**200** → `{ success, disponible, stockActual, solicitado }`
 
 ---
 
 ## 🛒 Carrito (`/carrito`)
 
-### Obtener Carrito
-```http
-GET /carrito
-Authorization: Bearer {token}
+Todas requieren token. Agregar al carrito **no aparta stock**: el stock se descuenta
+recién al confirmar la reserva.
 
-Respuesta 200:
-{
-  "success": true,
-  "carrito": {
-    "_id": "507f1f77bcf86cd799439012",
-    "usuario": "507f1f77bcf86cd799439011",
-    "items": [
-      {
-        "_id": "507f1f77bcf86cd799439013",
-        "producto": {
-          "_id": "507f1f77bcf86cd799439014",
-          "nombre": "Polín Impregnado 100x100mm",
-          ...
-        },
-        "cantidad": 5,
-        "precio": 45.99
-      }
-    ],
-    "total": 229.95
-  }
-}
-```
-
-### Agregar al Carrito
-```http
-POST /carrito/agregar
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "productoId": "507f1f77bcf86cd799439014",
-  "cantidad": 5
-}
-
-Respuesta 200:
-{
-  "success": true,
-  "message": "Producto agregado al carrito",
-  "carrito": { ... }
-}
-
-Respuesta 400:
-{
-  "success": false,
-  "message": "Stock insuficiente. Disponible: 3"
-}
-```
-
-### Actualizar Cantidad en Carrito
-```http
-PUT /carrito/actualizar
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "productoId": "507f1f77bcf86cd799439014",
-  "cantidad": 10
-}
-
-Respuesta 200:
-{
-  "success": true,
-  "message": "Carrito actualizado",
-  "carrito": { ... }
-}
-```
-
-### Eliminar del Carrito
-```http
-DELETE /carrito/producto/{productoId}
-Authorization: Bearer {token}
-
-Respuesta 200:
-{
-  "success": true,
-  "message": "Producto eliminado del carrito",
-  "carrito": { ... }
-}
-```
-
-### Vaciar Carrito
-```http
-DELETE /carrito/vaciar
-Authorization: Bearer {token}
-
-Respuesta 200:
-{
-  "success": true,
-  "message": "Carrito vaciado",
-  "carrito": {
-    "items": [],
-    "total": 0
-  }
-}
-```
+| Método | Ruta | Cuerpo | Qué hace |
+|---|---|---|---|
+| GET | `/carrito` | – | Devuelve el carrito con los productos |
+| POST | `/carrito/agregar` | `{ productoId, cantidad }` | Suma al carrito (cantidad 1–10.000). **409** si lo del carrito más lo nuevo supera el stock |
+| PUT | `/carrito/actualizar` | `{ productoId, cantidad }` | Cambia la cantidad; `0` lo quita |
+| DELETE | `/carrito/producto/:productoId` | – | Quita un producto |
+| DELETE | `/carrito/vaciar` | – | Vacía el carrito |
 
 ---
 
-## 📋 Pedidos (`/pedidos`)
+## 📋 Reservas (`/pedidos`)
 
-### Crear Pedido
+### Estados
+
+```
+pendiente → confirmado → listo → retirado
+    └──────────┴──────────┴──→ cancelado
+```
+
+| Estado | Significado |
+|---|---|
+| `pendiente` | Recién creada |
+| `confirmado` | El negocio la aceptó |
+| `listo` | Preparada para retirar (se avisa al cliente por correo) |
+| `retirado` | El cliente la retiró y pagó |
+| `cancelado` | Cancelada: el stock vuelve a quedar disponible |
+
+No se pueden saltar pasos (ej: `pendiente` → `retirado` responde 400).
+
+### Crear reserva
 ```http
 POST /pedidos
 Authorization: Bearer {token}
-Content-Type: application/json
 
-{
-  "metodoPago": "efectivo",
-  "direccionEntrega": {
-    "calle": "Calle Principal",
-    "numero": "123",
-    "ciudad": "Ciudad",
-    "codigoPostal": "28001"
-  }
-}
+{ "fechaRetiro": "2026-10-09", "nota": "Paso en la tarde con camioneta" }
+```
+Convierte el carrito en una reserva:
+- `fechaRetiro` (YYYY-MM-DD) debe ser hoy o futura, un día de `diasRetiro` y dentro de `anticipacionMaximaDias`.
+- `nota` es opcional (máx. 500 caracteres).
+- Todo ocurre en **una transacción**: se descuenta el stock de cada producto de forma
+  atómica, se crea la reserva y se vacía el carrito. Si falta stock de un solo producto
+  no se crea nada y el carrito queda igual (**409**). Dos reservas simultáneas nunca
+  venden más stock del que hay.
+- Se cobra el precio vigente al momento de reservar.
+- **409** si el cliente ya tiene `maxReservasActivasPorCliente` reservas sin retirar.
+- Envía un correo al negocio y otro de confirmación al cliente.
 
-Respuesta 201:
+**201**:
+```json
 {
   "success": true,
-  "message": "Pedido creado exitosamente",
-  "pedido": {
-    "numeroOrden": "ORD-ABC12345",
-    "total": 229.95,
-    "estado": "pendiente"
-  }
+  "message": "Reserva creada exitosamente",
+  "pedido": { "numeroOrden": "RES-HRMFBU", "total": 22500, "estado": "pendiente", "fechaRetiro": "2026-10-09T15:00:00.000Z" }
 }
 ```
 
-### Obtener Mis Pedidos
+### Mis reservas
 ```http
 GET /pedidos/mis-pedidos
 Authorization: Bearer {token}
-
-Respuesta 200:
-{
-  "success": true,
-  "total": 3,
-  "pedidos": [
-    {
-      "_id": "507f1f77bcf86cd799439015",
-      "numeroOrden": "ORD-ABC12345",
-      "usuario": "507f1f77bcf86cd799439011",
-      "items": [
-        {
-          "producto": { ... },
-          "cantidad": 5,
-          "precioUnitario": 45.99,
-          "subtotal": 229.95
-        }
-      ],
-      "total": 229.95,
-      "estado": "pendiente",
-      "metodoPago": "efectivo",
-      "direccionEntrega": { ... },
-      "createdAt": "2025-06-01T10:00:00Z"
-    }
-  ]
-}
 ```
+Las reservas del usuario, de la más reciente a la más antigua, con productos y datos del cliente.
 
-### Obtener Pedido por ID
+### Buscar por código
 ```http
-GET /pedidos/{id}
+GET /pedidos/buscar?codigo=RES-HRMFBU
 Authorization: Bearer {token}
-
-Respuesta 200:
-{
-  "success": true,
-  "pedido": { ... }
-}
-
-Respuesta 403:
-{
-  "success": false,
-  "message": "No autorizado"
-}
 ```
+Un cliente solo encuentra sus propias reservas; para las de otros responde **404**.
 
-### Obtener Todos los Pedidos (Admin)
+### Obtener una reserva
+```http
+GET /pedidos/:id
+Authorization: Bearer {token}
+```
+El cliente solo ve las suyas (**404** si no); el admin, cualquiera.
+
+### Todas las reservas (admin)
 ```http
 GET /pedidos?estado=pendiente&pagina=1&limite=10
-Authorization: Bearer {admin_token}
-
-Query Parameters:
-- estado: "pendiente" | "confirmado" | "enviado" | "entregado" | "cancelado" (opcional)
-- pagina: número de página (default: 1)
-- limite: items por página (default: 10)
-
-Respuesta 200:
-{
-  "success": true,
-  "total": 15,
-  "paginas": 2,
-  "paginaActual": 1,
-  "pedidos": [ ... ]
-}
+Authorization: Bearer {token_admin}
 ```
+Paginadas en la base de datos (`limite` máximo 100), de la más reciente a la más antigua.
 
-### Actualizar Estado de Pedido (Admin)
+### Retiros pendientes (admin)
 ```http
-PUT /pedidos/{id}/estado
-Authorization: Bearer {admin_token}
-Content-Type: application/json
+GET /pedidos/retiros
+Authorization: Bearer {token_admin}
+```
+Reservas en `pendiente`, `confirmado` o `listo`, ordenadas por fecha de retiro
+(incluye las atrasadas). Es lo que usa la pestaña "Retiros" del panel de admin.
 
-{
-  "estado": "confirmado",
-  "nota": "Pedido confirmado y listo para envío"
-}
+### Cambiar estado (admin)
+```http
+PUT /pedidos/:id/estado
+Authorization: Bearer {token_admin}
 
-Respuesta 200:
-{
-  "success": true,
-  "message": "Estado del pedido actualizado",
-  "pedido": {
-    "_id": "507f1f77bcf86cd799439015",
-    "estado": "confirmado",
-    "historialEstados": [
-      {
-        "estado": "pendiente",
-        "fecha": "2025-06-01T10:00:00Z",
-        "nota": "Pedido creado"
-      },
-      {
-        "estado": "confirmado",
-        "fecha": "2025-06-01T10:30:00Z",
-        "nota": "Pedido confirmado y listo para envío"
-      }
-    ]
-  }
-}
+{ "estado": "listo", "nota": "Preparado en bodega 2" }
+```
+- Valida la transición (ver tabla de estados).
+- Al pasar a `cancelado` devuelve el stock. La reserva queda bloqueada mientras cambia,
+  así que dos cancelaciones simultáneas no devuelven el stock dos veces.
+- Al pasar a `listo` avisa al cliente por correo.
+
+---
+
+## 🧪 Ejemplo: flujo completo de una reserva
+
+```bash
+API=http://localhost:3000/api
+
+# 1. Iniciar sesión
+TOKEN=$(curl -s -X POST $API/auth/login -H 'Content-Type: application/json' \
+  -d '{"email":"cliente@example.com","contrasena":"cliente123"}' | jq -r .token)
+
+# 2. Ver la leña disponible
+curl -s "$API/productos?categoria=lena" | jq '.productos[] | {id, nombre, precio, stock}'
+
+# 3. Agregar 5 sacos al carrito
+curl -s -X POST $API/carrito/agregar -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' -d '{"productoId":"<uuid>","cantidad":5}'
+
+# 4. Reservar para retirar el viernes
+curl -s -X POST $API/pedidos -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' -d '{"fechaRetiro":"2026-10-09"}'
 ```
 
 ---
 
-## 🔄 Estados de Pedido
+## Tests
 
-| Estado | Descripción |
-|--------|-------------|
-| `pendiente` | Pedido recién creado, awaiting confirmation |
-| `confirmado` | Pedido confirmado por administrador |
-| `enviado` | Pedido enviado al cliente |
-| `entregado` | Pedido entregado exitosamente |
-| `cancelado` | Pedido cancelado |
-
----
-
-## ❌ Códigos de Error Comunes
-
-| Código | Mensaje | Causa |
-|--------|---------|-------|
-| 400 | Bad Request | Datos inválidos o faltantes |
-| 401 | Unauthorized | Token no proporcionado o inválido |
-| 403 | Forbidden | Permiso denegado (no eres admin) |
-| 404 | Not Found | Recurso no encontrado |
-| 500 | Internal Server Error | Error en el servidor |
-
----
-
-## 🧪 Ejemplo Completo: Flujo de Compra
-
-```
-1. POST /auth/registro
-   → Obtener token
-
-2. GET /productos
-   → Ver catálogo
-
-3. GET /productos/{id}
-   → Ver detalles del producto
-
-4. POST /productos/validar-stock
-   → Validar disponibilidad
-
-5. POST /carrito/agregar
-   → Agregar al carrito
-
-6. GET /carrito
-   → Ver carrito
-
-7. PUT /carrito/actualizar
-   → Actualizar cantidades si es necesario
-
-8. POST /pedidos
-   → Crear pedido (descuenta stock automáticamente)
-
-9. GET /pedidos/mis-pedidos
-   → Ver mis pedidos
-
-10. (Admin) GET /pedidos
-    → Ver todos los pedidos
-
-11. (Admin) PUT /pedidos/{id}/estado
-    → Actualizar estado del pedido
+```bash
+cd backend
+npm test
 ```
 
----
-
-Para más información, consulta el README.md principal.
+Los tests usan una base de datos propia (`DATABASE_URL_TEST`, o la de desarrollo con
+`_test` al final), que se crea sola y se vacía en cada corrida. No ocupan ningún puerto
+ni envían correos, así que se pueden correr con el servidor de desarrollo encendido.

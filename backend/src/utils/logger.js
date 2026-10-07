@@ -9,6 +9,8 @@ if (!fs.existsSync(LOG_DIR)) fs.mkdirSync(LOG_DIR, { recursive: true });
 function timestamp() { return new Date().toISOString(); }
 
 function escribir(nivel, mensaje) {
+    // En los tests no se registra nada: ensuciaría la salida y el archivo de log real
+    if (process.env.NODE_ENV === 'test') return;
     const linea = `[${timestamp()}] [${nivel}] ${mensaje}\n`;
     console.log(linea.trim());
     fs.appendFile(path.join(LOG_DIR, 'app.log'), linea, () => {});
