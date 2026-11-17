@@ -68,7 +68,7 @@ async function api(ruta, { method = 'GET', body, auth = true } = {}) {
 function mostrarCargando(contenedor, texto = 'Cargando…') {
   contenedor.innerHTML = `
     <div class="flex items-center justify-center gap-3 py-10 text-neutral-500" role="status">
-      <span class="h-5 w-5 animate-spin rounded-full border-2 border-neutral-300 border-t-bosque" aria-hidden="true"></span>
+      <span class="h-5 w-5 animate-spin rounded-full border-2 border-neutral-400/40 border-t-oro" aria-hidden="true"></span>
       ${escaparHTML(texto)}
     </div>`;
 }

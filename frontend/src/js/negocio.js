@@ -27,8 +27,8 @@ function renderNegocio() {
   document.getElementById('checkoutLugarRetiro').innerHTML = `<strong>Retiro en:</strong> ${escaparHTML(direccion)}`;
   document.getElementById('negocioHorario').innerHTML = negocio.horario.map(h => `
     <li class="flex justify-between gap-4 py-2">
-      <span class="text-neutral-600">${escaparHTML(h.dias)}</span>
-      <span class="font-semibold text-neutral-800">${escaparHTML(h.horas)}</span>
+      <span class="text-white/60">${escaparHTML(h.dias)}</span>
+      <span class="font-semibold text-hueso">${escaparHTML(h.horas)}</span>
     </li>`).join('');
 
   if (negocio.ubicacionMaps) {
