@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Arquitectura de Agroforestal Monte Redondo",
+    "output": "docs/diagramas/arquitectura.html",
+    "locale": "es",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/Lukkas19xd/El-Galpon-del-polin-.git",
+      "provider": "github",
+      "revision": "be9bada796806485ca72d7f8ec78e3438ddf8539"
+    }
+  },
+  "layout": { "mode": "auto" },
+  "components": [
+    {
+      "id": "cliente",
+      "type": "external",
+      "label": "Cliente o admin",
+      "sublabel": "navegador"
+    },
+    {
+      "id": "pagina",
+      "type": "frontend",
+      "label": "Página web",
+      "sublabel": "HTML + JS + Tailwind",
+      "explanation": "Vistas en frontend/src/sections y lógica en frontend/src/js. Todas las llamadas pasan por api(), que apunta a localhost:3000/api en desarrollo o al mismo dominio en producción.",
+      "sources": [
+        { "path": "frontend/src/js/config.js", "line": 7, "end_line": 9, "label": "URL de la API" },
+        { "path": "frontend/src/js/utilidades.js", "line": 39, "end_line": 46, "label": "fetch a la API" }
+      ]
+    },
+    {
+      "id": "api",
+      "type": "backend",
+      "label": "API Express",
+      "sublabel": "Node · /api :3000",
+      "tag": "JWT + helmet",
+      "explanation": "Monta /api/auth, /api/productos, /api/carrito y /api/pedidos. Cada ruta protegida verifica el JWT y vuelve a leer el usuario en la base. En producción también sirve los archivos del frontend.",
+      "sources": [
+        { "path": "backend/src/app.js", "line": 135, "end_line": 138, "label": "rutas de la API" },
+        { "path": "backend/src/middlewares/auth.js", "line": 8, "end_line": 23, "label": "verificarToken" },
+        { "path": "backend/src/app.js", "line": 99, "end_line": 99, "label": "sirve el frontend" }
+      ]
+    },
+    {
+      "id": "postgres",
+      "type": "database",
+      "label": "PostgreSQL",
+      "sublabel": "usuarios, productos, reservas",
+      "sources": [
+        { "path": "backend/src/config/database.js", "line": 18, "end_line": 28, "label": "pool y esquema" },
+        { "path": "backend/sql/schema.sql", "line": 57, "end_line": 57, "label": "tabla pedidos" },
+        { "path": "backend/docker-compose.yml", "line": 1, "end_line": 12, "label": "Docker :5433" }
+      ]
+    },
+    {
+      "id": "gmail",
+      "type": "external",
+      "label": "Gmail",
+      "sublabel": "SMTP con Nodemailer",
+      "sources": [
+        { "path": "backend/src/utils/mailer.js", "line": 8, "end_line": 20, "label": "transporte Gmail" },
+        { "path": "backend/src/utils/mailer.js", "line": 92, "end_line": 113, "label": "envío" }
+      ]
+    },
+    {
+      "id": "google",
+      "type": "external",
+      "label": "Google Maps y Fonts",
+      "sublabel": "mapa y tipografías",
+      "sources": [
+        { "path": "frontend/src/js/negocio.js", "line": 37, "end_line": 40, "label": "mapa y Cómo llegar" },
+        { "path": "frontend/index.html", "line": 22, "end_line": 24, "label": "Google Fonts" }
+      ]
+    },
+    {
+      "id": "whatsapp",
+      "type": "external",
+      "label": "WhatsApp",
+      "sublabel": "enlace wa.me",
+      "sources": [
+        { "path": "frontend/src/js/negocio.js", "line": 44, "end_line": 44, "label": "enlace wa.me" }
+      ]
+    }
+  ],
+  "connections": [
+    { "id": "abre-pagina", "from": "cliente", "to": "pagina", "label": "navega y reserva", "variant": "emphasis" },
+    { "id": "llamadas-api", "from": "pagina", "to": "api", "label": "fetch JSON + JWT", "variant": "emphasis" },
+    { "id": "consultas-sql", "from": "api", "to": "postgres", "label": "SQL (pg)" },
+    { "id": "envio-correos", "from": "api", "to": "gmail", "label": "correos si hay GMAIL_*", "variant": "dashed" },
+    { "id": "carga-google", "from": "pagina", "to": "google", "label": "mapa y fuentes", "variant": "dashed" },
+    { "id": "abre-whatsapp", "from": "pagina", "to": "whatsapp", "label": "si hay número", "variant": "dashed" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "Rutas de la API", "items": ["/api/auth: registro, login y perfil", "/api/productos y /api/carrito", "/api/pedidos: reservas y retiros", "/api/negocio: dirección y horario"] },
+    { "dot": "rose", "title": "Seguridad", "items": ["JWT verificado contra la base en cada petición", "helmet con política de contenido", "Límites de peticiones en login, registro y reservas"] },
+    { "dot": "cyan", "title": "Desarrollo y producción", "items": ["Desarrollo: página en :8000 y API en :3000", "Producción: Express sirve la página y la API", "Los datos del negocio están en backend/data/negocio.js"] }
+  ]
+}
