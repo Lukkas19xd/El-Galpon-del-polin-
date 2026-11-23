@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
   <title>Agroforestal Monte Redondo SPA - Polines y Leña</title>
   <meta name="description" content="Polines impregnados y leña seca en saco. Reserva en línea y retira en nuestro galpón.">
   <meta name="theme-color" content="#161412">
@@ -23,13 +23,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Josefin+Sans:wght@400;600;700&display=swap">
   <!-- Generado con `npm run css` desde src/css/entrada.css -->
-  <link rel="stylesheet" href="src/css/estilos.css?v=2026-11-17">
+  <link rel="stylesheet" href="src/css/estilos.css?v=2026-11-23d">
 </head>
 <body class="font-sans text-hueso antialiased">
   <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[300] focus:rounded-md focus:bg-oro focus:px-4 focus:py-2 focus:font-bold focus:text-tinta">Saltar al contenido</a>
 
   <!-- Menú: los enlaces son rutas (#/productos) que maneja src/js/navegacion.js -->
-  <header class="sticky top-0 z-50 border-b border-oro/20 bg-carbon-bajo/90 backdrop-blur">
+  <header class="sticky top-0 z-50 border-b pt-[env(safe-area-inset-top)] border-oro/20 bg-carbon-bajo/90 backdrop-blur">
     <div class="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:gap-6 sm:px-6">
       <a href="#/inicio" class="flex shrink-0 items-center gap-3" aria-label="Agroforestal Monte Redondo, inicio">
         <img src="src/img/logo.png" alt="" class="h-10 w-10 rounded-lg bg-black p-1">
@@ -43,7 +43,7 @@
       <form role="search" onsubmit="buscarDesdeCabecera(event)" class="relative hidden flex-1 md:block">
         <label for="buscadorCabecera" class="sr-only">Buscar productos</label>
         <svg class="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-white/45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="m20 20-3.5-3.5"/></svg>
-        <input id="buscadorCabecera" type="search" placeholder="Busca polines, leña, medidas…"
+        <input id="buscadorCabecera" type="search" enterkeyhint="search" placeholder="Busca polines, leña, medidas…"
                class="w-full rounded-full border border-white/10 bg-carbon py-2.5 pl-12 pr-14 text-hueso placeholder:text-white/40 focus:border-oro/60 focus:outline-none">
         <button type="submit" class="absolute right-1.5 top-1/2 flex h-8 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-oro text-tinta hover:bg-oro-claro" aria-label="Buscar">
           <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="m20 20-3.5-3.5"/></svg>
@@ -73,7 +73,7 @@
         <li class="md:hidden">
           <form role="search" onsubmit="buscarDesdeCabecera(event)" class="mb-2">
             <label for="buscadorMenu" class="sr-only">Buscar productos</label>
-            <input id="buscadorMenu" type="search" placeholder="Buscar productos…" class="w-full rounded-full border border-white/10 bg-carbon px-5 py-2.5 text-hueso placeholder:text-white/40 focus:border-oro/60 focus:outline-none">
+            <input id="buscadorMenu" type="search" enterkeyhint="search" placeholder="Buscar productos…" class="w-full rounded-full border border-white/10 bg-carbon px-5 py-2.5 text-hueso placeholder:text-white/40 focus:border-oro/60 focus:outline-none">
           </form>
         </li>
         <li><a href="#/inicio" data-ruta="inicio" class="enlace-menu block py-1.5 hover:text-hueso">Inicio</a></li>
@@ -125,7 +125,7 @@
       </div>
     </div>
     <div class="border-t border-white/[0.06]">
-      <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-5 text-sm text-white/45 sm:px-6">
+      <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 pb-[calc(1.25rem+env(safe-area-inset-bottom))] pt-5 text-sm text-white/45 sm:px-6">
         <p>© 2026 Agroforestal Monte Redondo SPA</p>
         <p>Pagas al retirar · Sin pago en línea</p>
       </div>
@@ -134,12 +134,12 @@
 
   <!-- Botón flotante de WhatsApp (se muestra solo si hay número configurado) -->
   <a id="btnWhatsappFlotante" href="#" target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp"
-     class="fixed bottom-5 right-5 z-50 hidden h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-xl transition hover:scale-110">
+     class="fixed bottom-[calc(1.25rem+env(safe-area-inset-bottom))] right-[calc(1.25rem+env(safe-area-inset-right))] z-50 hidden h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-xl transition hover:scale-110">
     <svg viewBox="0 0 32 32" class="h-8 w-8" fill="currentColor" aria-hidden="true"><path d="M16.04 3C9.4 3 4 8.36 4 14.97c0 2.11.56 4.17 1.62 5.99L4 29l8.25-1.58a12.1 12.1 0 0 0 3.79.6C22.68 28.02 28 22.66 28 16.05 28 9.44 22.68 3 16.04 3zm0 22.82c-1.24 0-2.46-.22-3.6-.65l-.26-.1-4.9.94.97-4.75-.17-.28a9.72 9.72 0 0 1-1.5-5.2c0-5.4 4.42-9.79 9.86-9.79 5.43 0 9.75 4.39 9.75 9.98 0 5.45-4.36 9.85-10.15 9.85zm5.4-7.32c-.3-.15-1.75-.86-2.02-.96-.27-.1-.47-.15-.67.15-.2.3-.77.96-.94 1.16-.17.2-.35.22-.64.07-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.47-1.75-1.65-2.04-.17-.3-.02-.46.13-.6.13-.14.3-.35.44-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.6-.92-2.2-.24-.57-.48-.5-.67-.5h-.57c-.2 0-.52.08-.79.37-.27.3-1.04 1.01-1.04 2.46 0 1.45 1.06 2.86 1.21 3.05.15.2 2.09 3.18 5.06 4.46.71.3 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.08 1.75-.71 2-1.4.25-.7.25-1.29.17-1.41-.07-.12-.27-.2-.57-.35z"/></svg>
   </a>
 
   <!-- Ventana modal (detalles de reserva, formularios del admin). Se cierra con Esc o clic afuera. -->
-  <div id="modal" class="fixed inset-0 z-[100] hidden overflow-y-auto bg-black/60 p-4 backdrop-blur-sm" onclick="if (event.target === this) cerrarModal()">
+  <div id="modal" class="fixed inset-0 z-[100] hidden overflow-y-auto overscroll-contain bg-black/60 p-4 backdrop-blur-sm" onclick="if (event.target === this) cerrarModal()">
     <div role="dialog" aria-modal="true" aria-labelledby="modalTitulo" class="relative mx-auto mt-10 w-full max-w-lg rounded-[18px] bg-[#F7F2EA] p-6 shadow-2xl sm:p-8">
       <button type="button" onclick="cerrarModal()" aria-label="Cerrar"
               class="absolute right-3 top-3 rounded-md px-2 text-2xl font-bold leading-none text-neutral-400 hover:text-neutral-900">&times;</button>
@@ -148,20 +148,22 @@
   </div>
 
   <!-- Avisos flotantes; aria-live hace que los lectores de pantalla los anuncien -->
-  <div id="avisos" class="fixed right-4 top-20 z-[200] flex w-[calc(100%-2rem)] max-w-xs flex-col gap-2" role="status" aria-live="polite"></div>
+  <div id="avisos" class="fixed right-4 top-[calc(5rem+env(safe-area-inset-top))] z-[200] flex w-[calc(100%-2rem)] max-w-xs flex-col gap-2" role="status" aria-live="polite"></div>
 
   <!-- Scripts: comparten variables globales, por eso el orden importa. El ?v= obliga a
        bajar la versión nueva; debe coincidir con VERSION_DATOS en src/js/config.js. -->
-  <script src="src/js/config.js?v=2026-11-17"></script>
-  <script src="src/js/utilidades.js?v=2026-11-17"></script>
-  <script src="src/js/cargarSecciones.js?v=2026-11-17"></script>
-  <script src="src/js/negocio.js?v=2026-11-17"></script>
-  <script src="src/js/sesion.js?v=2026-11-17"></script>
-  <script src="src/js/catalogo.js?v=2026-11-17"></script>
-  <script src="src/js/carrito.js?v=2026-11-17"></script>
-  <script src="src/js/cuenta.js?v=2026-11-17"></script>
-  <script src="src/js/admin.js?v=2026-11-17"></script>
-  <script src="src/js/navegacion.js?v=2026-11-17"></script>
-  <script src="src/js/app.js?v=2026-11-17"></script>
+  <script src="src/js/config.js?v=2026-11-23d"></script>
+  <script src="src/js/utilidades.js?v=2026-11-23d"></script>
+  <!-- Selector de datos de prueba: solo actúa en localhost (ver el archivo) -->
+  <script src="src/js/datosPrueba.js?v=2026-11-23d"></script>
+  <script src="src/js/cargarSecciones.js?v=2026-11-23d"></script>
+  <script src="src/js/negocio.js?v=2026-11-23d"></script>
+  <script src="src/js/sesion.js?v=2026-11-23d"></script>
+  <script src="src/js/catalogo.js?v=2026-11-23d"></script>
+  <script src="src/js/carrito.js?v=2026-11-23d"></script>
+  <script src="src/js/cuenta.js?v=2026-11-23d"></script>
+  <script src="src/js/admin.js?v=2026-11-23d"></script>
+  <script src="src/js/navegacion.js?v=2026-11-23d"></script>
+  <script src="src/js/app.js?v=2026-11-23d"></script>
 </body>
 </html>

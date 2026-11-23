@@ -8,6 +8,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   actualizarMenuSesion();
   cargarNegocio();
+  // La entrada en abanico de la portada se ve una sola vez: al volver al
+  // inicio (algo frecuente) las tarjetas ya están en su lugar
+  const abanico = document.querySelector('.entrada-abanico');
+  abanico?.lastElementChild.addEventListener('animationend', () => abanico.classList.remove('entrada-abanico'), { once: true });
+
   navegacionLista = true;
   mostrarRutaActual();
 

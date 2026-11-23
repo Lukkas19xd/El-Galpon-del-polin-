@@ -9,6 +9,9 @@
 //  - madera / bosque: los paneles claros (carrito, reserva, perfil, admin…).
 //    madera es un dorado más oscuro para que se lea sobre fondo claro.
 module.exports = {
+  // hover: solo con mouse o trackpad. En el celular un toque deja el :hover
+  // pegado hasta tocar otra cosa (el botón queda "marcado").
+  future: { hoverOnlyWhenSupported: true },
   content: ['./index.html', './src/sections/**/*.html', './src/js/**/*.js'],
   theme: {
     extend: {

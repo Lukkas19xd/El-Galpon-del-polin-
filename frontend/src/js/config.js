@@ -12,7 +12,7 @@ const API_URL = window.location.port === '8000'
 // que tenía guardado de la página (sesión, usuario, carrito) la próxima vez que
 // la abra, para no arrastrar datos de la versión anterior.
 // Debe coincidir con el ?v= de los <script> y el CSS en index.html.
-const VERSION_DATOS = '2026-11-17';
+const VERSION_DATOS = '2026-11-23d';
 
 const almacen = {
   leer(clave) {
@@ -44,6 +44,8 @@ let negocioInfo = null;
 
 // ============ CONSTANTES ============
 const monedaCLP = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' });
+// Cantidades con separador de miles (12.000 y no 12000)
+const numeroCL = new Intl.NumberFormat('es-CL');
 
 const NOMBRES_TIPO = { impregnado: 'Impregnado', estandar: 'Estándar', lena: 'Leña' };
 const NOMBRES_CATEGORIA = { agricola: 'Agrícola', construccion: 'Construcción', industrial: 'Industrial', lena: 'Leña en saco' };

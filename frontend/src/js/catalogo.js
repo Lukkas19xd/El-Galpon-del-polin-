@@ -54,10 +54,12 @@ async function cargarProductos() {
     resumen.textContent = productos.length === 1 ? '1 producto' : `${productos.length} productos`;
 
     if (productos.length === 0) {
+      // Sin filtros, el catálogo está vacío de verdad: no hay "todo el catálogo" al que volver
+      const conFiltros = Boolean(leerFiltros().toString());
       grid.innerHTML = `
         <div class="col-span-full rounded-xl border border-white/[0.08] bg-carbon p-10 text-center text-white/60">
-          <p class="mb-4">No encontramos productos con esos filtros.</p>
-          <a href="#/productos" class="inline-block rounded-full bg-oro px-5 py-2 text-sm font-bold text-tinta hover:bg-oro-claro">Ver todo el catálogo</a>
+          <p>${conFiltros ? 'No encontramos productos con esos filtros.' : 'Todavía no hay productos publicados.'}</p>
+          ${conFiltros ? '<a href="#/productos" class="mt-4 inline-block rounded-full bg-oro px-5 py-2 text-sm font-bold text-tinta hover:bg-oro-claro">Ver todo el catálogo</a>' : ''}
         </div>`;
       return;
     }
@@ -89,15 +91,19 @@ const ILUSTRACION_POLINES = `
 
 function imagenProducto(producto) {
   if (producto.imagen) {
-    return `<img src="${escaparHTML(producto.imagen)}" alt="${escaparHTML(producto.nombre)}" loading="lazy" class="h-full w-full object-cover">`;
+    // Si la foto no carga (enlace roto), se muestra la ilustración que queda oculta detrás
+    return `<img src="${escaparHTML(producto.imagen)}" alt="${escaparHTML(producto.nombre)}" loading="lazy" class="h-full w-full object-cover opacity-0 transition-opacity duration-300"
+                 onload="this.classList.remove('opacity-0')"
+                 onerror="this.nextElementSibling.classList.remove('hidden'); this.remove()">
+            <div class="hidden">${producto.tipo === 'lena' ? ILUSTRACION_LENA : ILUSTRACION_POLINES}</div>`;
   }
   return producto.tipo === 'lena' ? ILUSTRACION_LENA : ILUSTRACION_POLINES;
 }
 
 function disponibilidad(producto) {
   if (producto.stock <= 0) return '<span class="font-semibold text-red-400">Agotado</span>';
-  const cantidad = `${producto.stock} ${unidadPlural(producto, producto.stock)}`;
-  if (producto.stock <= 10) return `<span class="font-semibold text-amber-400">¡Quedan ${cantidad}!</span>`;
+  const cantidad = `${numeroCL.format(producto.stock)} ${unidadPlural(producto, producto.stock)}`;
+  if (producto.stock <= 10) return `<span class="font-semibold text-amber-400">¡${producto.stock === 1 ? 'Queda' : 'Quedan'} ${cantidad}!</span>`;
   return `<span class="text-white/50">${cantidad} disponibles</span>`;
 }
 
@@ -126,17 +132,17 @@ function crearTarjetaProducto(producto, contexto = 'catalogo') {
   }
 
   return `
-    <article class="flex flex-col overflow-hidden rounded-xl border border-white/[0.08] bg-carbon transition hover:-translate-y-1 hover:border-oro/40">
+    <article class="relative flex flex-col overflow-hidden rounded-xl border border-white/[0.08] bg-carbon transition hover:-translate-y-1 hover:border-oro/40">
       <div class="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-papel">
         ${imagenProducto(producto)}
         <span class="absolute left-3 top-3 rounded-full bg-oro px-3 py-1 text-xs font-bold text-tinta">${escaparHTML(NOMBRES_TIPO[producto.tipo] || producto.tipo)}</span>
       </div>
       <div class="flex flex-1 flex-col p-4">
         <p class="text-sm text-white/50">${escaparHTML(NOMBRES_CATEGORIA[producto.categoria] || producto.categoria || '')}</p>
-        <h3 class="mt-1 text-lg font-semibold leading-snug text-hueso">${escaparHTML(producto.nombre)}</h3>
+        <h3 class="mt-1 text-lg font-semibold leading-snug text-hueso [overflow-wrap:anywhere]">${escaparHTML(producto.nombre)}</h3>
         <p class="mt-2 line-clamp-2 text-sm text-white/55" title="${escaparHTML(descripcion)}">${escaparHTML(descripcion)}</p>
         <div class="mb-4 mt-auto pt-4">
-          <p><span class="text-2xl font-bold text-hueso">${monedaCLP.format(producto.precio)}</span>
+          <p><span class="text-2xl font-bold tabular-nums text-hueso">${monedaCLP.format(producto.precio)}</span>
              <span class="text-sm text-white/50">/ ${unidadDe(producto)}</span></p>
           <p class="mt-1 text-sm">${disponibilidad(producto)}</p>
         </div>
