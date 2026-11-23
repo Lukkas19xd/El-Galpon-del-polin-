@@ -22,7 +22,15 @@ module.exports = {
         hueso: '#F5F2EB',
         papel: '#F1E9DE',
         madera: { DEFAULT: '#8F6630', claro: '#A87B3C', oscuro: '#6E4E24' },
-        bosque: { DEFAULT: '#2A221B', claro: '#40352B', oscuro: '#1C1712', noche: '#161412' }
+        bosque: { DEFAULT: '#2A221B', claro: '#40352B', oscuro: '#1C1712', noche: '#161412' },
+        // Grises con tinte de madera en vez del gris neutro (frío) de Tailwind:
+        // los paneles claros son papel cálido (#F7F2EA) y un gris azulado desentona.
+        // Los textos -500 en adelante cumplen contraste 4.5:1 sobre ese papel.
+        neutral: {
+          50: '#FAF7F2', 100: '#F1EBE2', 200: '#E4DACC', 300: '#D0C2B0',
+          400: '#A3958A', 500: '#75675A', 600: '#5C5047', 700: '#463D35',
+          800: '#302923', 900: '#211C18', 950: '#161412'
+        }
       },
       fontFamily: {
         sans: ['"IBM Plex Sans"', '"Segoe UI"', 'Arial', 'sans-serif'],

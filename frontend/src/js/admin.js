@@ -59,7 +59,7 @@ async function cargarProductosAdmin() {
           <td class="p-3">${escaparHTML(NOMBRES_CATEGORIA[producto.categoria] || producto.categoria)}</td>
           <td class="p-3">${producto.activo ? 'Visible' : 'Oculto'}</td>
           <td class="space-x-1 whitespace-nowrap p-3 text-right">
-            ${botonTabla('Editar', `abrirFormProducto('${id}')`, 'bg-blue-600')}
+            ${botonTabla('Editar', `abrirFormProducto('${id}')`, 'bg-madera')}
             ${producto.activo
               ? botonTabla('Ocultar', `cambiarVisibilidadProducto('${id}', false)`, 'bg-neutral-600')
               : botonTabla('Mostrar', `cambiarVisibilidadProducto('${id}', true)`)}
@@ -177,7 +177,7 @@ async function cargarPedidosAdmin() {
         <td class="p-3">${etiquetaEstado(pedido.estado)}</td>
         <td class="p-3">${formatearFecha(pedido.createdAt)}</td>
         <td class="p-3">${formatearFecha(pedido.fechaRetiro)}</td>
-        <td class="p-3 text-right">${botonTabla('Ver', `abrirDetallesPedido('${escaparHTML(pedido._id)}')`, 'bg-blue-600')}</td>
+        <td class="p-3 text-right">${botonTabla('Ver', `abrirDetallesPedido('${escaparHTML(pedido._id)}')`, 'bg-madera')}</td>
       </tr>`).join('') : celdaVacia(7, 'Todavía no hay reservas.');
   } catch (error) {
     tabla.innerHTML = filaFalla(7, error.message, 'cargarPedidosAdmin()');
@@ -313,7 +313,7 @@ async function cargarUsuarios() {
         <td class="p-3">${escaparHTML(usuario.telefono || '—')}</td>
         <td class="p-3">${usuario.rol === 'administrador' ? 'Administrador' : 'Cliente'}</td>
         <td class="p-3">${usuario.activo ? 'Activo' : 'Desactivado'}</td>
-        <td class="p-3 text-right">${botonTabla('Editar', `abrirFormUsuario('${escaparHTML(usuario._id)}')`, 'bg-blue-600')}</td>
+        <td class="p-3 text-right">${botonTabla('Editar', `abrirFormUsuario('${escaparHTML(usuario._id)}')`, 'bg-madera')}</td>
       </tr>`).join('');
   } catch (error) {
     tabla.innerHTML = filaFalla(6, error.message, 'cargarUsuarios()');

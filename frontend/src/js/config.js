@@ -12,7 +12,7 @@ const API_URL = window.location.port === '8000'
 // que tenía guardado de la página (sesión, usuario, carrito) la próxima vez que
 // la abra, para no arrastrar datos de la versión anterior.
 // Debe coincidir con el ?v= de los <script> y el CSS en index.html.
-const VERSION_DATOS = '2026-11-23d';
+const VERSION_DATOS = '2026-11-23e';
 
 const almacen = {
   leer(clave) {
