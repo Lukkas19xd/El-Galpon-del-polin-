@@ -1,72 +1,165 @@
-<section id="seccion-inicio">
-  <div class="relative isolate overflow-hidden rounded-2xl shadow-2xl">
-    <!-- Cielo -->
-    <div class="absolute inset-0 bg-gradient-to-b from-bosque-noche via-bosque to-bosque-claro"></div>
-    <!-- Resplandor -->
-    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.2),transparent_60%)]"></div>
-    <!-- Capas de pinos (profundidad) -->
-    <div class="bosque-capa-fondo absolute inset-x-0 bottom-0 h-40 opacity-40"></div>
-    <div class="bosque-capa-medio absolute inset-x-0 bottom-0 h-52 opacity-65"></div>
-    <div class="bosque-capa-frente absolute inset-x-0 bottom-0 h-64 opacity-90"></div>
-    <!-- Oscurecedor para contraste del texto -->
-    <div class="absolute inset-0 bg-black/25"></div>
+<section id="seccion-inicio" class="space-y-20">
+  <!-- Portada -->
+  <div class="relative isolate overflow-hidden rounded-[22px] border border-oro/20 bg-carbon">
+    <!-- Resplandor cálido detrás de las tarjetas -->
+    <div class="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_75%_40%,rgba(150,95,50,0.45),transparent_60%)]" aria-hidden="true"></div>
 
-    <!-- Contenido -->
-    <div class="relative px-6 py-24 text-center text-white sm:py-32">
-      <img src="src/img/logo.png" alt="" class="mx-auto mb-6 h-28 w-28 rounded-2xl bg-black p-3 shadow-2xl sm:h-36 sm:w-36">
-      <h1 class="mb-4 text-3xl font-extrabold tracking-tight drop-shadow-lg sm:text-5xl">Agroforestal Monte Redondo SPA</h1>
-      <p class="mx-auto mb-10 max-w-xl text-lg text-white/90 drop-shadow sm:text-xl">Polines impregnados y leña seca en saco, listos para reservar y retirar</p>
-      <a href="#/productos" class="inline-block rounded-md bg-madera px-8 py-4 text-lg font-bold shadow-lg transition hover:-translate-y-0.5 hover:bg-madera-claro">Ver catálogo</a>
+    <div class="grid items-center gap-12 px-6 py-12 sm:px-12 sm:py-16 lg:grid-cols-[1.05fr_1fr]">
+      <div>
+        <span class="mb-7 block h-1 w-16 rounded-full bg-oro" aria-hidden="true"></span>
+        <p class="mb-4 text-sm font-semibold uppercase tracking-[0.14em] text-oro">Reserva en línea · Retira en el galpón</p>
+        <h1 class="mb-6 text-4xl font-bold leading-[1.05] text-[#F7F1E8] sm:text-6xl">Polines y leña, directo del galpón</h1>
+        <p class="mb-9 max-w-lg text-lg leading-relaxed text-white/70">Polines impregnados para el campo y la construcción, y leña seca en saco para tu estufa. Eliges el día de retiro y pagas cuando vienes a buscarlos.</p>
+        <div class="flex flex-wrap gap-3">
+          <a href="#/productos" class="rounded-full bg-oro px-7 py-3.5 font-bold text-tinta transition hover:-translate-y-0.5 hover:bg-oro-claro">Ver catálogo</a>
+          <a href="#/productos?categoria=lena" class="rounded-full border border-white/20 px-7 py-3.5 font-semibold text-hueso transition hover:border-oro/60">Leña en saco</a>
+        </div>
+      </div>
+
+      <!-- Tres tarjetas en abanico con ilustraciones de los productos -->
+      <div class="entrada-abanico relative mx-auto h-72 w-full max-w-md sm:h-80" aria-hidden="true">
+        <div class="absolute bottom-2 left-0 w-[38%] -rotate-[7deg] rounded-2xl bg-papel p-3 shadow-2xl">
+          <svg viewBox="0 0 120 120" class="w-full">
+            <ellipse cx="60" cy="106" rx="44" ry="5" fill="#000" opacity=".08"/>
+            <rect x="24" y="24" width="18" height="82" rx="9" fill="#7E5230"/>
+            <rect x="51" y="12" width="18" height="94" rx="9" fill="#9C6A3E"/>
+            <rect x="78" y="30" width="18" height="76" rx="9" fill="#7E5230"/>
+            <path d="M24 52h18M24 80h18M51 42h18M51 72h18M78 58h18M78 86h18" stroke="#3E2814" stroke-opacity=".3" stroke-width="2"/>
+            <ellipse cx="33" cy="28" rx="7" ry="3" fill="#D8B27A"/><ellipse cx="60" cy="16" rx="7" ry="3" fill="#D8B27A"/><ellipse cx="87" cy="34" rx="7" ry="3" fill="#D8B27A"/>
+          </svg>
+          <p class="mt-1 text-center text-xs font-bold uppercase tracking-wider text-tinta/70">Polines</p>
+        </div>
+        <div class="absolute left-1/2 top-0 z-10 w-[42%] -translate-x-1/2 rounded-2xl bg-papel p-3 shadow-2xl">
+          <svg viewBox="0 0 120 120" class="w-full">
+            <ellipse cx="60" cy="108" rx="48" ry="5" fill="#000" opacity=".08"/>
+            <g stroke="#6E4524" stroke-width="3" fill="#D4A96A">
+              <circle cx="30" cy="88" r="16"/><circle cx="60" cy="88" r="16"/><circle cx="90" cy="88" r="16"/>
+              <circle cx="45" cy="60" r="16"/><circle cx="75" cy="60" r="16"/><circle cx="60" cy="32" r="16"/>
+            </g>
+            <g stroke="#A8763F" stroke-width="1.5" fill="none">
+              <circle cx="30" cy="88" r="9"/><circle cx="60" cy="88" r="9"/><circle cx="90" cy="88" r="9"/>
+              <circle cx="45" cy="60" r="9"/><circle cx="75" cy="60" r="9"/><circle cx="60" cy="32" r="9"/>
+              <circle cx="30" cy="88" r="3.5"/><circle cx="60" cy="88" r="3.5"/><circle cx="90" cy="88" r="3.5"/>
+              <circle cx="45" cy="60" r="3.5"/><circle cx="75" cy="60" r="3.5"/><circle cx="60" cy="32" r="3.5"/>
+            </g>
+          </svg>
+          <p class="mt-1 text-center text-xs font-bold uppercase tracking-wider text-tinta/70">Impregnados</p>
+        </div>
+        <div class="absolute bottom-2 right-0 w-[38%] rotate-[7deg] rounded-2xl bg-papel p-3 shadow-2xl">
+          <svg viewBox="0 0 120 120" class="w-full">
+            <ellipse cx="60" cy="108" rx="40" ry="5" fill="#000" opacity=".08"/>
+            <g stroke="#6E4524" stroke-width="2.5" fill="#D4A96A">
+              <circle cx="46" cy="36" r="9"/><circle cx="62" cy="30" r="9"/><circle cx="76" cy="38" r="9"/>
+            </g>
+            <path d="M32 50 Q22 102 40 106 H80 Q98 102 88 50 Z" fill="#B98C55"/>
+            <rect x="30" y="44" width="60" height="9" rx="4" fill="#6E4524"/>
+            <text x="60" y="86" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#5A3A1E" letter-spacing="1">LEÑA</text>
+          </svg>
+          <p class="mt-1 text-center text-xs font-bold uppercase tracking-wider text-tinta/70">Leña en saco</p>
+        </div>
+      </div>
     </div>
+  </div>
+
+  <!-- Cómo funciona, en tres puntos -->
+  <div class="!mt-6 grid overflow-hidden rounded-xl border border-white/[0.08] bg-carbon/70 sm:grid-cols-3 sm:divide-x sm:divide-white/[0.08]">
+    <div class="flex items-center gap-4 px-6 py-5">
+      <svg class="h-7 w-7 shrink-0 text-oro" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      <div><p class="font-semibold">Tú eliges el día</p><p class="text-sm text-white/55">Reserva y retira cuando te acomode</p></div>
+    </div>
+    <div class="flex items-center gap-4 border-t border-white/[0.08] px-6 py-5 sm:border-t-0">
+      <svg class="h-7 w-7 shrink-0 text-oro" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>
+      <div><p class="font-semibold">Pagas al retirar</p><p class="text-sm text-white/55">Sin pago en línea ni tarjetas</p></div>
+    </div>
+    <div class="flex items-center gap-4 border-t border-white/[0.08] px-6 py-5 sm:border-t-0">
+      <svg class="h-7 w-7 shrink-0 text-oro" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+      <div><p class="font-semibold">Stock apartado</p><p class="text-sm text-white/55">Tu pedido queda reservado al confirmar</p></div>
+    </div>
+  </div>
+
+  <!-- Productos destacados en carrusel (los carga cargarDestacados en catalogo.js) -->
+  <div>
+    <div class="mb-6 flex items-center justify-between gap-4">
+      <h2 class="text-2xl font-bold text-[#F7F1E8] sm:text-3xl">Nuestros productos</h2>
+      <div class="flex items-center gap-2">
+        <a href="#/productos" class="rounded-full bg-oro px-5 py-2 text-sm font-bold text-tinta hover:bg-oro-claro">Ver todos</a>
+        <button type="button" onclick="moverCarrusel('destacadosCarrusel', -1)" class="hidden h-10 w-10 items-center justify-center rounded-full border border-white/15 text-hueso hover:border-oro/60 sm:flex" aria-label="Ver productos anteriores">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <button type="button" onclick="moverCarrusel('destacadosCarrusel', 1)" class="hidden h-10 w-10 items-center justify-center rounded-full border border-white/15 text-hueso hover:border-oro/60 sm:flex" aria-label="Ver más productos">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+      </div>
+    </div>
+    <div id="destacadosCarrusel" class="carrusel relative -mx-4 flex overscroll-x-contain snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth px-4 pb-2 sm:mx-0 sm:px-0"></div>
   </div>
 
   <!-- Categorías: llevan al catálogo ya filtrado -->
-  <div class="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-    <a href="#/productos?categoria=industrial" class="group block rounded-xl border border-neutral-200 bg-white p-6 text-left shadow-sm transition hover:-translate-y-1 hover:border-madera hover:shadow-lg">
-      <span class="mb-3 block text-4xl">🏭</span>
-      <h3 class="mb-1 text-lg font-bold text-bosque">Industrial</h3>
-      <p class="text-sm text-neutral-500">Polines para proyectos industriales de gran escala.</p>
-    </a>
-    <a href="#/productos?categoria=construccion" class="group block rounded-xl border border-neutral-200 bg-white p-6 text-left shadow-sm transition hover:-translate-y-1 hover:border-madera hover:shadow-lg">
-      <span class="mb-3 block text-4xl">🏗️</span>
-      <h3 class="mb-1 text-lg font-bold text-bosque">Construcción</h3>
-      <p class="text-sm text-neutral-500">Soluciones en madera para obra y estructura.</p>
-    </a>
-    <a href="#/productos?categoria=agricola" class="group block rounded-xl border border-neutral-200 bg-white p-6 text-left shadow-sm transition hover:-translate-y-1 hover:border-madera hover:shadow-lg">
-      <span class="mb-3 block text-4xl">🌾</span>
-      <h3 class="mb-1 text-lg font-bold text-bosque">Agrícola</h3>
-      <p class="text-sm text-neutral-500">Polines resistentes para uso agrícola.</p>
-    </a>
-    <a href="#/productos?categoria=lena" class="group block rounded-xl border border-neutral-200 bg-white p-6 text-left shadow-sm transition hover:-translate-y-1 hover:border-madera hover:shadow-lg">
-      <span class="mb-3 block text-4xl">🪵</span>
-      <h3 class="mb-1 text-lg font-bold text-bosque">Leña en saco</h3>
-      <p class="text-sm text-neutral-500">Leña seca lista para la estufa, la cocina y el asado.</p>
-    </a>
+  <div>
+    <h2 class="mb-6 text-2xl font-bold text-[#F7F1E8] sm:text-3xl">Explora por categoría</h2>
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <a href="#/productos?categoria=lena" class="group rounded-xl border border-white/[0.08] bg-carbon p-6 transition hover:-translate-y-1 hover:border-oro/40">
+        <span class="mb-5 flex h-12 w-12 items-center justify-center rounded-lg bg-oro/15 text-oro">
+          <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+        </span>
+        <h3 class="mb-1 text-lg font-semibold">Leña en saco</h3>
+        <p class="text-sm text-white/55">Leña seca lista para la estufa, la cocina y el asado.</p>
+      </a>
+      <a href="#/productos?categoria=agricola" class="group rounded-xl border border-white/[0.08] bg-carbon p-6 transition hover:-translate-y-1 hover:border-oro/40">
+        <span class="mb-5 flex h-12 w-12 items-center justify-center rounded-lg bg-oro/15 text-oro">
+          <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 20h10"/><path d="M10 20c5.5-2.5.8-6.4 3-10"/><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"/></svg>
+        </span>
+        <h3 class="mb-1 text-lg font-semibold">Agrícola</h3>
+        <p class="text-sm text-white/55">Polines resistentes para viñas, cercos y huertos.</p>
+      </a>
+      <a href="#/productos?categoria=construccion" class="group rounded-xl border border-white/[0.08] bg-carbon p-6 transition hover:-translate-y-1 hover:border-oro/40">
+        <span class="mb-5 flex h-12 w-12 items-center justify-center rounded-lg bg-oro/15 text-oro">
+          <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>
+        </span>
+        <h3 class="mb-1 text-lg font-semibold">Construcción</h3>
+        <p class="text-sm text-white/55">Madera para obra, estructuras y galpones.</p>
+      </a>
+      <a href="#/productos?categoria=industrial" class="group rounded-xl border border-white/[0.08] bg-carbon p-6 transition hover:-translate-y-1 hover:border-oro/40">
+        <span class="mb-5 flex h-12 w-12 items-center justify-center rounded-lg bg-oro/15 text-oro">
+          <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M17 18h1M12 18h1M7 18h1"/></svg>
+        </span>
+        <h3 class="mb-1 text-lg font-semibold">Industrial</h3>
+        <p class="text-sm text-white/55">Polines para proyectos de gran escala.</p>
+      </a>
+    </div>
   </div>
 
-  <!-- Dónde retirar: se completa con los datos de GET /api/negocio (ver renderNegocio en app.js) -->
-  <div class="mt-16 grid grid-cols-1 overflow-hidden rounded-2xl bg-white shadow-2xl md:grid-cols-2">
-    <div class="space-y-6 p-8">
+  <!-- Dónde retirar: se completa con los datos de GET /api/negocio (ver renderNegocio en negocio.js) -->
+  <div id="donde-retirar" class="grid grid-cols-1 overflow-hidden rounded-[22px] border border-white/[0.08] bg-carbon md:grid-cols-2">
+    <div class="space-y-7 p-8 sm:p-10">
       <div>
-        <h2 class="mb-1 text-2xl font-bold text-bosque">Dónde retirar tu pedido</h2>
-        <p class="text-sm text-neutral-500">Reservas en línea, retiras y pagas en el galpón.</p>
+        <span class="mb-5 block h-1 w-12 rounded-full bg-oro" aria-hidden="true"></span>
+        <h2 class="mb-2 text-2xl font-bold text-[#F7F1E8] sm:text-3xl">Dónde retirar tu pedido</h2>
+        <p class="text-white/60">Reservas en línea, retiras y pagas en el galpón.</p>
       </div>
       <div>
-        <h3 class="mb-1 text-sm font-bold uppercase tracking-wide text-madera">Dirección</h3>
-        <p id="negocioDireccion" class="text-neutral-800">—</p>
+        <h3 class="mb-1 text-sm font-semibold uppercase tracking-[0.14em] text-oro">Dirección</h3>
+        <p id="negocioDireccion" class="text-hueso">—</p>
       </div>
       <div>
-        <h3 class="mb-2 text-sm font-bold uppercase tracking-wide text-madera">Horario de atención</h3>
-        <ul id="negocioHorario" class="divide-y divide-neutral-100 text-sm"></ul>
+        <h3 class="mb-2 text-sm font-semibold uppercase tracking-[0.14em] text-oro">Horario de atención</h3>
+        <ul id="negocioHorario" class="divide-y divide-white/[0.08] text-sm"></ul>
       </div>
       <div class="flex flex-wrap gap-3">
-        <a id="negocioComoLlegar" href="#" target="_blank" rel="noopener" class="hidden rounded-md bg-bosque px-5 py-3 font-bold text-white shadow hover:bg-bosque-claro">📍 Cómo llegar</a>
-        <a id="negocioWhatsapp" href="#" target="_blank" rel="noopener" class="hidden rounded-md bg-[#25D366] px-5 py-3 font-bold text-white shadow hover:brightness-95">💬 Escríbenos por WhatsApp</a>
+        <a id="negocioComoLlegar" href="#" target="_blank" rel="noopener" class="hidden rounded-full bg-oro px-6 py-3 font-bold text-tinta hover:bg-oro-claro">Cómo llegar</a>
+        <a id="negocioWhatsapp" href="#" target="_blank" rel="noopener" class="hidden rounded-full border border-white/20 px-6 py-3 font-semibold text-hueso hover:border-[#25D366]">Escríbenos por WhatsApp</a>
       </div>
     </div>
-    <div class="min-h-[18rem] bg-neutral-100">
+    <div class="min-h-[18rem] bg-carbon-alto">
       <iframe id="negocioMapa" title="Mapa de ubicación" class="hidden h-full min-h-[18rem] w-full border-0" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-      <div id="negocioMapaVacio" class="flex h-full min-h-[18rem] items-center justify-center p-8 text-center text-sm text-neutral-400">Mapa disponible próximamente</div>
+      <div id="negocioMapaVacio" class="flex h-full min-h-[18rem] items-center justify-center p-8 text-center text-sm text-white/40">Mapa disponible próximamente</div>
     </div>
+  </div>
+
+  <!-- Cierre -->
+  <div class="rounded-[22px] border border-oro/20 bg-[radial-gradient(ellipse_at_center,rgba(150,95,50,0.30),transparent_70%)] px-6 py-14 text-center">
+    <h2 class="mb-3 text-3xl font-bold text-[#F7F1E8] sm:text-4xl">Reserva hoy, retira cuando te acomode.</h2>
+    <p class="mx-auto mb-8 max-w-xl text-white/65">Arma tu pedido, elige el día de retiro y te avisamos por correo cuando esté listo.</p>
+    <a href="#/productos" class="inline-block rounded-full bg-oro px-8 py-3.5 font-bold text-tinta transition hover:-translate-y-0.5 hover:bg-oro-claro">Empezar mi reserva</a>
   </div>
 </section>

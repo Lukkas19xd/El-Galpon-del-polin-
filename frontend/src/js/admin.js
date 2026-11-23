@@ -55,11 +55,11 @@ async function cargarProductosAdmin() {
         <tr class="${producto.activo ? '' : 'bg-neutral-50 text-neutral-400'}">
           <td class="p-3 font-semibold">${escaparHTML(producto.nombre)}</td>
           <td class="p-3">${monedaCLP.format(producto.precio)}</td>
-          <td class="p-3 ${producto.stock <= 10 ? 'font-bold text-amber-700' : ''}">${producto.stock}</td>
+          <td class="p-3 tabular-nums ${producto.stock <= 10 ? 'font-bold text-amber-700' : ''}">${numeroCL.format(producto.stock)}</td>
           <td class="p-3">${escaparHTML(NOMBRES_CATEGORIA[producto.categoria] || producto.categoria)}</td>
           <td class="p-3">${producto.activo ? 'Visible' : 'Oculto'}</td>
           <td class="space-x-1 whitespace-nowrap p-3 text-right">
-            ${botonTabla('Editar', `abrirFormProducto('${id}')`, 'bg-blue-600')}
+            ${botonTabla('Editar', `abrirFormProducto('${id}')`, 'bg-madera')}
             ${producto.activo
               ? botonTabla('Ocultar', `cambiarVisibilidadProducto('${id}', false)`, 'bg-neutral-600')
               : botonTabla('Mostrar', `cambiarVisibilidadProducto('${id}', true)`)}
@@ -95,11 +95,11 @@ function abrirFormProducto(productoId) {
       <div class="grid grid-cols-2 gap-4">
         <div>
           <label for="prodPrecio" class="mb-1 block text-sm font-semibold">Precio (CLP)</label>
-          <input id="prodPrecio" type="number" required min="0" step="1" value="${valor('precio')}" class="${campoClase}">
+          <input id="prodPrecio" type="number" inputmode="numeric" required min="0" step="1" value="${valor('precio')}" class="${campoClase}">
         </div>
         <div>
           <label for="prodStock" class="mb-1 block text-sm font-semibold">Stock</label>
-          <input id="prodStock" type="number" required min="0" step="1" value="${valor('stock')}" class="${campoClase}">
+          <input id="prodStock" type="number" inputmode="numeric" required min="0" step="1" value="${valor('stock')}" class="${campoClase}">
         </div>
         <div>
           <label for="prodTipo" class="mb-1 block text-sm font-semibold">Tipo</label>
@@ -177,7 +177,7 @@ async function cargarPedidosAdmin() {
         <td class="p-3">${etiquetaEstado(pedido.estado)}</td>
         <td class="p-3">${formatearFecha(pedido.createdAt)}</td>
         <td class="p-3">${formatearFecha(pedido.fechaRetiro)}</td>
-        <td class="p-3 text-right">${botonTabla('Ver', `abrirDetallesPedido('${escaparHTML(pedido._id)}')`, 'bg-blue-600')}</td>
+        <td class="p-3 text-right">${botonTabla('Ver', `abrirDetallesPedido('${escaparHTML(pedido._id)}')`, 'bg-madera')}</td>
       </tr>`).join('') : celdaVacia(7, 'Todavía no hay reservas.');
   } catch (error) {
     tabla.innerHTML = filaFalla(7, error.message, 'cargarPedidosAdmin()');
@@ -185,7 +185,7 @@ async function cargarPedidosAdmin() {
 }
 
 const resumenItems = (pedido) => (pedido.items || []).map((item) =>
-  `<li>${escaparHTML(item.producto?.nombre || 'Producto')} × ${item.cantidad}</li>`).join('');
+  `<li class="[overflow-wrap:anywhere]">${escaparHTML(item.producto?.nombre || 'Producto')} × ${numeroCL.format(item.cantidad)}</li>`).join('');
 
 const botonesEstado = (pedido) => (ESTADOS[pedido.estado]?.siguientes || []).map((estado) => `
   <button type="button" class="rounded-md px-3 py-2 text-sm font-bold text-white shadow hover:opacity-90 disabled:opacity-60 ${estado === 'cancelado' ? 'bg-red-600' : 'bg-bosque'}"
@@ -206,10 +206,10 @@ async function abrirDetallesPedido(pedidoId) {
     abrirModal(`
       <h3 id="modalTitulo" class="mb-3 text-lg font-bold text-bosque">Reserva ${escaparHTML(pedido.numeroOrden)}</h3>
       <p class="mb-1"><strong>Cliente:</strong> ${escaparHTML(pedido.usuario?.nombre)}</p>
-      <p class="mb-1"><strong>Contacto:</strong> ${contactoCliente(pedido.usuario)}</p>
-      <p class="mb-1"><strong>Retiro:</strong> <span class="capitalize">${formatearFechaLarga(pedido.fechaRetiro)}</span></p>
+      <p class="mb-1 [overflow-wrap:anywhere]"><strong>Contacto:</strong> ${contactoCliente(pedido.usuario)}</p>
+      <p class="mb-1"><strong>Retiro:</strong> ${capitalizar(formatearFechaLarga(pedido.fechaRetiro))}</p>
       <p class="mb-1"><strong>Total:</strong> ${monedaCLP.format(pedido.total)}</p>
-      ${pedido.nota ? `<p class="mb-1"><strong>Nota:</strong> ${escaparHTML(pedido.nota)}</p>` : ''}
+      ${pedido.nota ? `<p class="mb-1 [overflow-wrap:anywhere]"><strong>Nota:</strong> ${escaparHTML(pedido.nota)}</p>` : ''}
       <ul class="mb-3 ml-5 list-disc text-sm text-neutral-700">${resumenItems(pedido)}</ul>
       <p class="mb-4"><strong>Estado:</strong> ${etiquetaEstado(pedido.estado)}</p>
       ${botones
@@ -266,7 +266,7 @@ async function cargarRetirosAdmin() {
       if (clave === 'atrasados') return `<h4 class="font-bold text-red-700">⚠️ Atrasadas: no se retiraron en su fecha ${total}</h4>`;
       if (clave === hoy) return `<h4 class="font-bold text-bosque">Hoy · ${fechaLarga(clave)} ${total}</h4>`;
       if (clave === manana) return `<h4 class="font-bold text-bosque">Mañana · ${fechaLarga(clave)} ${total}</h4>`;
-      return `<h4 class="font-bold capitalize text-neutral-700">${fechaLarga(clave)} ${total}</h4>`;
+      return `<h4 class="font-bold text-neutral-700">${capitalizar(fechaLarga(clave))} ${total}</h4>`;
     };
 
     const tarjeta = (pedido) => `
@@ -277,9 +277,9 @@ async function cargarRetirosAdmin() {
             ${etiquetaEstado(pedido.estado)}
             <span class="text-xs text-neutral-500">Retiro: ${formatearFecha(pedido.fechaRetiro)}</span>
           </div>
-          <p class="text-sm"><strong>${escaparHTML(pedido.usuario?.nombre)}</strong> · ${contactoCliente(pedido.usuario)}</p>
+          <p class="text-sm [overflow-wrap:anywhere]"><strong>${escaparHTML(pedido.usuario?.nombre)}</strong> · ${contactoCliente(pedido.usuario)}</p>
           <ul class="ml-5 list-disc text-sm text-neutral-600">${resumenItems(pedido)}</ul>
-          ${pedido.nota ? `<p class="text-sm italic text-neutral-500">“${escaparHTML(pedido.nota)}”</p>` : ''}
+          ${pedido.nota ? `<p class="text-sm italic text-neutral-500 [overflow-wrap:anywhere]">“${escaparHTML(pedido.nota)}”</p>` : ''}
         </div>
         <div class="space-y-2 text-right">
           <p class="text-lg font-bold text-madera">${monedaCLP.format(pedido.total)}</p>
@@ -313,7 +313,7 @@ async function cargarUsuarios() {
         <td class="p-3">${escaparHTML(usuario.telefono || '—')}</td>
         <td class="p-3">${usuario.rol === 'administrador' ? 'Administrador' : 'Cliente'}</td>
         <td class="p-3">${usuario.activo ? 'Activo' : 'Desactivado'}</td>
-        <td class="p-3 text-right">${botonTabla('Editar', `abrirFormUsuario('${escaparHTML(usuario._id)}')`, 'bg-blue-600')}</td>
+        <td class="p-3 text-right">${botonTabla('Editar', `abrirFormUsuario('${escaparHTML(usuario._id)}')`, 'bg-madera')}</td>
       </tr>`).join('');
   } catch (error) {
     tabla.innerHTML = filaFalla(6, error.message, 'cargarUsuarios()');
@@ -327,7 +327,7 @@ function abrirFormUsuario(usuarioId) {
 
   abrirModal(`
     <h3 id="modalTitulo" class="mb-1 text-lg font-bold text-bosque">${escaparHTML(usuario.nombre)}</h3>
-    <p class="mb-4 text-sm text-neutral-500">${escaparHTML(usuario.email)}</p>
+    <p class="mb-4 text-sm text-neutral-500 [overflow-wrap:anywhere]">${escaparHTML(usuario.email)}</p>
     <form onsubmit="guardarUsuario(event, '${escaparHTML(usuario._id)}')" class="space-y-4">
       <div>
         <label for="usuarioRol" class="mb-1 block text-sm font-semibold">Rol</label>

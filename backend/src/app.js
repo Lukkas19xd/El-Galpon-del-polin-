@@ -54,16 +54,16 @@ if (process.env.TRUST_PROXY) {
 
 // Cabeceras de seguridad. La política de contenido permite lo que usa el
 // frontend: sus propios scripts, los onclick en línea, fotos de productos
-// por https y el mapa de Google.
+// por https, el mapa de Google y las tipografías de Google Fonts.
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'"],
       scriptSrcAttr: ["'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
       imgSrc: ["'self'", 'data:', 'https:'],
-      fontSrc: ["'self'", 'data:'],
+      fontSrc: ["'self'", 'data:', 'https://fonts.gstatic.com'],
       connectSrc: ["'self'"],
       frameSrc: ['https://www.google.com'],
       // En local se sirve por http; forzar https rompería la página

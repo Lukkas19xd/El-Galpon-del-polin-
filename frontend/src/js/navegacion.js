@@ -3,7 +3,7 @@
 // en la misma vista y se puede compartir un enlace directo (ej: #/productos?categoria=lena).
 
 const RUTAS = {
-  inicio: { titulo: 'Polines y Leña' },
+  inicio: { titulo: 'Polines y Leña', cargar: cargarDestacados },
   productos: { titulo: 'Catálogo', cargar: mostrarCatalogo },
   login: { titulo: 'Iniciar sesión' },
   registro: { titulo: 'Crear cuenta' },
@@ -76,13 +76,19 @@ function mostrarRutaActual() {
 function marcarEnlaceActivo(nombre) {
   document.querySelectorAll('.enlace-menu').forEach((enlace) => {
     const activo = enlace.dataset.ruta === nombre;
-    enlace.classList.toggle('bg-white/15', activo);
     if (activo) {
       enlace.setAttribute('aria-current', 'page');
     } else {
       enlace.removeAttribute('aria-current');
     }
   });
+}
+
+// Buscador de la cabecera: abre el catálogo con la búsqueda (#/productos?q=...)
+function buscarDesdeCabecera(event) {
+  event.preventDefault();
+  const texto = event.target.querySelector('input').value.trim();
+  irA(texto ? `productos?q=${encodeURIComponent(texto)}` : 'productos');
 }
 
 // ============ MENÚ EN CELULAR ============

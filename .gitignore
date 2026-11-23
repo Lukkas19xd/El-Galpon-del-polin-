@@ -11,3 +11,9 @@ backend/logs/
 .DS_Store
 backend/db.json
 backend/db.json
+
+# Comprobantes de Archify (rutas locales, se regeneran)
+docs/diagramas/*.finalize.json
+docs/diagramas/*.finalize-summary.json
+docs/diagramas/*.browser-check.json
+docs/diagramas/*.delivery.json

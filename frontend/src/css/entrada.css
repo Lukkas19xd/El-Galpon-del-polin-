@@ -3,62 +3,182 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Fondo de bosque armado con 3 capas de SVG en mosaico (sin imágenes externas):
-   cada capa repite una silueta de pino con distinto tamaño/color para dar profundidad.
-   Se usan en el hero de inicio y, invertidas, en el pie de página. */
-.bosque-capa-fondo {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,10 80,55 20,55' fill='%233A7A4F'/%3E%3Cpolygon points='50,30 85,75 15,75' fill='%233A7A4F'/%3E%3Cpolygon points='50,50 100,100 0,100' fill='%233A7A4F'/%3E%3C/svg%3E");
-  background-repeat: repeat-x;
-  background-position: bottom;
-  background-size: 90px 100px;
+/* Tema "oscuro cálido": fondo casi negro con un resplandor café arriba */
+html {
+  color-scheme: dark;
+  /* En el celular: sin el destello gris al tocar (cada control tiene su :active)
+     y sin agrandar el texto al girar el teléfono */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
 }
-.bosque-capa-medio {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 120'%3E%3Cpolygon points='50,0 82,50 18,50' fill='%232D5F3F'/%3E%3Cpolygon points='50,22 88,70 12,70' fill='%232D5F3F'/%3E%3Cpolygon points='50,45 100,120 0,120' fill='%232D5F3F'/%3E%3C/svg%3E");
-  background-repeat: repeat-x;
-  background-position: bottom;
-  background-size: 120px 140px;
-}
-.bosque-capa-frente {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140'%3E%3Cpolygon points='50,0 83,52 17,52' fill='%23163D27'/%3E%3Cpolygon points='50,24 90,78 10,78' fill='%23163D27'/%3E%3Cpolygon points='50,50 100,140 0,140' fill='%23163D27'/%3E%3C/svg%3E");
-  background-repeat: repeat-x;
-  background-position: bottom;
-  background-size: 150px 170px;
-}
-
-/* Foto de pinos de fondo (Unsplash, licencia libre) fija detrás del contenido,
-   con un velo verde oscuro para que el texto y las tarjetas se lean bien.
-   La ruta es relativa a este CSS (src/css/). */
 body {
-  background-color: #0F2A1B;
+  background-color: #161412;
   background-image:
-    linear-gradient(rgba(15, 42, 27, 0.25), rgba(15, 42, 27, 0.6)),
-    url("../img/fondo-pinos.jpg");
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
+    radial-gradient(1200px 500px at 70% -10%, rgba(140, 90, 45, 0.18), transparent 70%),
+    radial-gradient(900px 400px at 0% 0%, rgba(201, 160, 99, 0.06), transparent 70%);
+  background-repeat: no-repeat;
+  color: #F5F2EB;
 }
 
-/* Las vistas con títulos sueltos van sobre un panel claro para no perderse
-   contra la foto; inicio, login y registro ya traen sus propias tarjetas. */
-#main-content > section:not(#seccion-inicio):not(#seccion-login):not(#seccion-registro) {
-  background-color: rgba(255, 255, 255, 0.96);
-  border-radius: 1rem;
+/* Títulos grandes con la tipografía de marca */
+h1, h2 { font-family: "Josefin Sans", "Century Gothic", Futura, sans-serif; }
+
+/* Las vistas de trabajo (carrito, reserva, perfil, admin…) van sobre un panel
+   claro; inicio, catálogo, login y registro tienen su propio diseño. */
+#main-content > section:not(#seccion-inicio):not(#seccion-productos):not(#seccion-login):not(#seccion-registro) {
+  background-color: #F7F2EA;
+  color: #1A1712;
+  color-scheme: light;
+  border-radius: 1.125rem;
   padding: 2rem;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 25px 60px -20px rgba(0, 0, 0, 0.7);
 }
 @media (max-width: 640px) {
-  #main-content > section:not(#seccion-inicio):not(#seccion-login):not(#seccion-registro) {
+  #main-content > section:not(#seccion-inicio):not(#seccion-productos):not(#seccion-login):not(#seccion-registro) {
     padding: 1.25rem;
   }
 }
 
-/* Foco visible al navegar con teclado (no aparece al hacer clic con el mouse) */
-:focus-visible {
-  outline: 3px solid #A0644E;
-  outline-offset: 2px;
+/* La ventana modal también es un panel claro */
+#modal [role="dialog"] { color: #1A1712; color-scheme: light; }
+
+/* Enlace del menú de la vista actual (lo marca navegacion.js) */
+.enlace-menu[aria-current="page"] { color: #C9A063; }
+
+/* Opciones de los select oscuros */
+.campo-oscuro option { background-color: #1C1917; color: #F5F2EB; }
+
+/* Carrusel horizontal sin barra visible */
+.carrusel { scrollbar-width: none; }
+.carrusel::-webkit-scrollbar { display: none; }
+
+/* ============ CELULAR ============ */
+/* Con viewport-fit=cover la página llega a los bordes; el contenido se aleja
+   de los bordes redondeados y la muesca al girar el teléfono */
+body {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
 }
 
-/* El celular no soporta bien el fondo fijo: lo dejamos desplazarse */
-@media (max-width: 768px) {
-  body { background-attachment: scroll; }
+/* iOS hace zoom al escribir en campos con letra menor a 16px y no lo deshace */
+@media (pointer: coarse) {
+  input, select, textarea { font-size: 16px; }
+}
+
+/* Toque inmediato (sin esperar un posible doble toque) */
+a, button, [role="button"], summary, label, select {
+  touch-action: manipulation;
+}
+
+/* Mantener el dedo sobre un botón no selecciona su texto ni abre el menú de copiar.
+   El texto normal (direcciones, códigos de reserva) sigue siendo seleccionable. */
+button, [role="button"], [role="tab"] {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Respuesta al tocar: el botón se achica un poco mientras el dedo está encima.
+   Se usa la propiedad scale para no pisar los transform de Tailwind. */
+button, a.rounded-full, a.rounded-md {
+  transition-property: scale, color, background-color, border-color, opacity, transform;
+  transition-duration: 120ms;
+  transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+}
+button:not(:disabled):active, a.rounded-full:active, a.rounded-md:active {
+  scale: 0.97;
+}
+
+/* ============ MOVIMIENTO ============ */
+:root {
+  /* Curva de salida marcada: arranca rápido, así la respuesta se siente inmediata */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Ventana modal: el fondo aparece con un fundido y la ventana sube apenas
+   desde 97 %. Se usa poco (detalle de reserva, formularios del admin), así
+   que puede animarse. Al cerrar desaparece al instante. */
+#modal:not(.hidden) {
+  transition: opacity 200ms var(--ease-out);
+}
+#modal:not(.hidden) [role="dialog"] {
+  transition: opacity 250ms var(--ease-out), transform 250ms var(--ease-out);
+}
+@starting-style {
+  #modal:not(.hidden) { opacity: 0; }
+  #modal:not(.hidden) [role="dialog"] { opacity: 0; transform: translateY(8px) scale(0.97); }
+}
+
+/* Avisos: entran desde arriba y salen más rápido de lo que entran.
+   Transiciones (no keyframes) para que varios avisos seguidos no se corten. */
+#avisos > div {
+  transition: opacity 400ms ease, transform 400ms ease;
+}
+@starting-style {
+  #avisos > div { opacity: 0; transform: translateY(-8px); }
+}
+#avisos > div.saliendo {
+  opacity: 0;
+  transform: translateY(-4px);
+  transition-duration: 200ms;
+}
+
+/* Menú del celular: aparece en 150 ms. En escritorio está siempre visible y no se anima. */
+@media (max-width: 1023px) {
+  #menuPrincipal.flex {
+    transition: opacity 150ms var(--ease-out), transform 150ms var(--ease-out);
+  }
+  @starting-style {
+    #menuPrincipal.flex { opacity: 0; transform: translateY(-4px); }
+  }
+}
+
+/* Portada: las tres tarjetas suben y aparecen una tras otra, la del centro
+   primero. Se usa la propiedad translate para no pisar su rotación. */
+@keyframes abanico-entrada {
+  from { opacity: 0; translate: 0 28px; }
+}
+.entrada-abanico > div {
+  animation: abanico-entrada 600ms var(--ease-out) both;
+}
+.entrada-abanico > div:nth-child(2) { animation-delay: 80ms; }
+.entrada-abanico > div:nth-child(1) { animation-delay: 190ms; }
+.entrada-abanico > div:nth-child(3) { animation-delay: 260ms; }
+
+/* Reserva recién creada: entra desde abajo y un borde dorado se apaga
+   lentamente para que el cliente la encuentre de inmediato */
+@keyframes reserva-entrada {
+  from { opacity: 0; translate: 0 14px; }
+}
+@keyframes reserva-brillo {
+  0%, 35% { box-shadow: 0 0 0 3px #C9A063, 0 12px 30px -8px rgba(201, 160, 99, 0.55); }
+  100% { box-shadow: 0 0 0 0 rgba(201, 160, 99, 0), 0 1px 2px rgba(0, 0, 0, 0.05); }
+}
+.reserva-nueva {
+  animation: reserva-entrada 450ms var(--ease-out) both, reserva-brillo 3200ms ease-out 200ms both;
+}
+
+/* La rueda de "Cargando" gira un poco más rápido: la espera se siente más corta */
+.animate-spin { animation-duration: 700ms; }
+
+/* Quien pidió menos movimiento en su sistema: se quitan los desplazamientos y
+   escalas, y se mantienen los fundidos de color y opacidad. */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    transition-property: opacity, color, background-color, border-color !important;
+    scroll-behavior: auto !important;
+  }
+  button:not(:disabled):active, a.rounded-full:active, a.rounded-md:active { scale: none; }
+  @starting-style {
+    #modal:not(.hidden) [role="dialog"], #avisos > div, #menuPrincipal.flex { transform: none; }
+  }
+  /* Entradas: solo fundido, sin desplazamiento */
+  @keyframes abanico-entrada { from { opacity: 0; } }
+  @keyframes reserva-entrada { from { opacity: 0; } }
+}
+
+/* Foco visible al navegar con teclado (no aparece al hacer clic con el mouse) */
+:focus-visible {
+  outline: 3px solid #C9A063;
+  outline-offset: 2px;
 }

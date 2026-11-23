@@ -2,6 +2,32 @@
 
 const contarUnidades = (carrito) => (carrito?.items || []).reduce((suma, item) => suma + item.cantidad, 0);
 
+// Último número mostrado en el globo; null hasta la primera carga
+let contadorAnterior = null;
+
+// El globo del carrito "late" cuando suben las unidades: confirma que el
+// producto se agregó aunque el carrito esté arriba, lejos del botón.
+function animarContadorCarrito() {
+  const contador = document.getElementById('carritoContador');
+  const boton = contador.parentElement;
+  if (menosMovimiento()) {
+    contador.animate([{ opacity: 0.3 }, { opacity: 1 }], { duration: 300, easing: 'ease' });
+    return;
+  }
+  contador.animate(
+    [
+      { transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(201, 160, 99, 0.7)' },
+      { transform: 'scale(1.35)', boxShadow: '0 0 0 6px rgba(201, 160, 99, 0.35)', offset: 0.35 },
+      { transform: 'scale(1)', boxShadow: '0 0 0 12px rgba(201, 160, 99, 0)' }
+    ],
+    { duration: 550, easing: EASE_OUT }
+  );
+  boton.animate(
+    [{ transform: 'rotate(0)' }, { transform: 'rotate(-10deg)', offset: 0.3 }, { transform: 'rotate(6deg)', offset: 0.6 }, { transform: 'rotate(0)' }],
+    { duration: 450, easing: 'ease-out' }
+  );
+}
+
 // Con un número lo muestra; sin argumentos lo consulta a la API
 async function actualizarContadorCarrito(cantidad) {
   const contador = document.getElementById('carritoContador');
@@ -16,7 +42,10 @@ async function actualizarContadorCarrito(cantidad) {
       }
     }
   }
-  contador.textContent = cantidad;
+  // El globo es chico: sobre 99 muestra "99+" y el número exacto queda en el carrito
+  contador.textContent = cantidad > 99 ? '99+' : cantidad;
+  if (contadorAnterior !== null && cantidad > contadorAnterior) animarContadorCarrito();
+  contadorAnterior = cantidad;
 }
 
 async function cargarCarrito() {
@@ -40,11 +69,20 @@ async function cargarCarrito() {
     document.getElementById('carritoItems').innerHTML = carrito.items.map((item) => {
       const producto = item.producto;
       const id = escaparHTML(producto._id);
+      // El producto pudo ocultarse o agotarse después de agregarlo: se avisa acá
+      // y no recién al confirmar la reserva
+      let aviso = '';
+      if (producto.activo === false || producto.stock <= 0) {
+        aviso = 'Ya no está disponible: quítalo para poder reservar.';
+      } else if (item.cantidad > producto.stock) {
+        aviso = `Solo ${producto.stock === 1 ? 'queda' : 'quedan'} ${numeroCL.format(producto.stock)} ${unidadPlural(producto, producto.stock)}: baja la cantidad.`;
+      }
       return `
         <li class="flex flex-wrap items-center gap-4 py-4">
           <div class="min-w-[12rem] flex-1">
-            <p class="font-bold text-bosque">${escaparHTML(producto.nombre)}</p>
+            <p class="font-bold text-bosque [overflow-wrap:anywhere]">${escaparHTML(producto.nombre)}</p>
             <p class="text-sm text-neutral-500">${monedaCLP.format(item.precio)} / ${unidadDe(producto)}</p>
+            ${aviso ? `<p class="mt-1 text-sm font-semibold text-red-700">${escaparHTML(aviso)}</p>` : ''}
           </div>
           <div class="flex items-center gap-2">
             <label for="carrito-${id}" class="text-sm text-neutral-600">Cantidad</label>
@@ -52,7 +90,7 @@ async function cargarCarrito() {
                    class="w-20 rounded-md border border-neutral-300 px-2 py-1 text-center"
                    onchange="actualizarCantidadCarrito('${id}', this.value)">
           </div>
-          <p class="w-28 text-right font-bold">${monedaCLP.format(item.cantidad * item.precio)}</p>
+          <p class="min-w-[7rem] whitespace-nowrap text-right font-bold tabular-nums">${monedaCLP.format(item.cantidad * item.precio)}</p>
           <button type="button" onclick="eliminarDelCarrito('${id}', this)" aria-label="Quitar ${escaparHTML(producto.nombre)} del carrito"
                   class="rounded-md px-3 py-1 text-sm font-bold text-red-700 hover:bg-red-50">Quitar</button>
         </li>`;
@@ -80,10 +118,32 @@ async function actualizarCantidadCarrito(productoId, cantidad) {
   cargarCarrito();
 }
 
+// La fila quitada se desvanece hacia la derecha y después se cierra el hueco,
+// en vez de desaparecer y hacer saltar la lista
+async function retirarFila(fila) {
+  if (!fila) return;
+  if (menosMovimiento()) {
+    await fila.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 150, fill: 'forwards' }).finished;
+    return;
+  }
+  await fila.animate(
+    [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateX(24px)' }],
+    { duration: 180, easing: EASE_OUT, fill: 'forwards' }
+  ).finished;
+  const alto = fila.offsetHeight;
+  fila.style.overflow = 'hidden';
+  await fila.animate(
+    [{ height: `${alto}px`, paddingTop: getComputedStyle(fila).paddingTop, paddingBottom: getComputedStyle(fila).paddingBottom },
+     { height: '0px', paddingTop: '0px', paddingBottom: '0px' }],
+    { duration: 200, easing: EASE_OUT, fill: 'forwards' }
+  ).finished;
+}
+
 async function eliminarDelCarrito(productoId, boton) {
   try {
     await conBotonOcupado(boton, 'Quitando…', () =>
       api(`/carrito/producto/${encodeURIComponent(productoId)}`, { method: 'DELETE' }));
+    await retirarFila(boton.closest('li'));
     mostrarMensaje('Producto quitado del carrito', 'success');
   } catch (error) {
     mostrarMensaje(error.message, 'error');
@@ -150,6 +210,8 @@ async function handleCompra(event) {
     document.getElementById('formCheckout').reset();
     actualizarContadorCarrito(0);
     mostrarMensaje(`¡Reserva ${data.pedido.numeroOrden} creada! Te enviamos la confirmación por correo.`, 'success');
+    // Mis reservas resalta esta tarjeta al mostrarla (ver cargarMisReservas)
+    reservaRecienCreada = data.pedido.numeroOrden;
     irA('mis-reservas');
   } catch (error) {
     mostrarError('checkoutError', error.message);

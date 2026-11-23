@@ -1,0 +1,294 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Cómo se crea una reserva",
+    "output": "docs/diagramas/flujo-reserva.html",
+    "locale": "es",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/Lukkas19xd/El-Galpon-del-polin-.git",
+      "provider": "github",
+      "revision": "be9bada796806485ca72d7f8ec78e3438ddf8539"
+    }
+  },
+  "participants": [
+    {
+      "id": "cliente",
+      "type": "external",
+      "label": "Cliente",
+      "sublabel": "navegador"
+    },
+    {
+      "id": "pagina",
+      "type": "frontend",
+      "label": "Página web",
+      "sublabel": "checkout",
+      "sources": [
+        {
+          "path": "frontend/src/js/carrito.js",
+          "line": 132,
+          "end_line": 157,
+          "label": "handleCompra"
+        }
+      ]
+    },
+    {
+      "id": "api",
+      "type": "backend",
+      "label": "API Express",
+      "sublabel": "POST /api/pedidos",
+      "sources": [
+        {
+          "path": "backend/src/routes/pedidoRoutes.js",
+          "line": 12,
+          "end_line": 12,
+          "label": "ruta y middlewares"
+        },
+        {
+          "path": "backend/src/controllers/pedidoController.js",
+          "line": 79,
+          "end_line": 116,
+          "label": "crearPedido"
+        },
+        {
+          "path": "backend/src/middlewares/auth.js",
+          "line": 8,
+          "end_line": 23,
+          "label": "verificarToken"
+        }
+      ]
+    },
+    {
+      "id": "postgres",
+      "type": "database",
+      "label": "PostgreSQL",
+      "sublabel": "transacción",
+      "sources": [
+        {
+          "path": "backend/src/models/Pedido.js",
+          "line": 117,
+          "end_line": 193,
+          "label": "crearDesdeCarrito"
+        }
+      ]
+    },
+    {
+      "id": "gmail",
+      "type": "external",
+      "label": "Gmail",
+      "sublabel": "Nodemailer",
+      "sources": [
+        {
+          "path": "backend/src/controllers/pedidoController.js",
+          "line": 71,
+          "end_line": 75,
+          "label": "en segundo plano"
+        },
+        {
+          "path": "backend/src/utils/mailer.js",
+          "line": 92,
+          "end_line": 113,
+          "label": "envío"
+        }
+      ]
+    }
+  ],
+  "segments": [
+    {
+      "from": 228,
+      "to": 408,
+      "label": "Sesión y reglas"
+    },
+    {
+      "from": 410,
+      "to": 580,
+      "label": "Transacción"
+    },
+    {
+      "from": 584,
+      "to": 638,
+      "label": "Respuesta"
+    },
+    {
+      "from": 646,
+      "to": 722,
+      "label": "Correos"
+    }
+  ],
+  "messages": [
+    {
+      "id": "confirmar",
+      "from": "cliente",
+      "to": "pagina",
+      "y": 160,
+      "label": "confirma la reserva"
+    },
+    {
+      "id": "post-pedido",
+      "from": "pagina",
+      "to": "api",
+      "y": 190,
+      "label": "POST /api/pedidos",
+      "variant": "emphasis",
+      "note": "JWT + fecha de retiro y nota"
+    },
+    {
+      "id": "verifica-usuario",
+      "from": "api",
+      "to": "postgres",
+      "y": 240,
+      "label": "¿cuenta activa?",
+      "variant": "security",
+      "note": "verificarToken; límite 10 reservas/hora"
+    },
+    {
+      "id": "usuario-ok",
+      "from": "postgres",
+      "to": "api",
+      "y": 300,
+      "label": "rol y estado",
+      "variant": "return"
+    },
+    {
+      "id": "cuenta-activas",
+      "from": "api",
+      "to": "postgres",
+      "y": 330,
+      "label": "cuenta reservas activas",
+      "note": "antes valida la fecha; con 5 o más responde 409"
+    },
+    {
+      "id": "activas",
+      "from": "postgres",
+      "to": "api",
+      "y": 386,
+      "label": "cantidad",
+      "variant": "return"
+    },
+    {
+      "id": "bloquea",
+      "from": "api",
+      "to": "postgres",
+      "y": 418,
+      "label": "BEGIN y bloquea el carrito",
+      "variant": "emphasis",
+      "note": "SELECT … FOR UPDATE"
+    },
+    {
+      "id": "descuenta",
+      "from": "api",
+      "to": "postgres",
+      "y": 468,
+      "label": "UPDATE stock si alcanza",
+      "variant": "emphasis",
+      "note": "por producto; si falta stock: ROLLBACK y 409"
+    },
+    {
+      "id": "inserta",
+      "from": "api",
+      "to": "postgres",
+      "y": 526,
+      "label": "INSERT reserva, vacía carrito"
+    },
+    {
+      "id": "commit",
+      "from": "postgres",
+      "to": "api",
+      "y": 558,
+      "label": "COMMIT",
+      "variant": "return"
+    },
+    {
+      "id": "respuesta",
+      "from": "api",
+      "to": "pagina",
+      "y": 594,
+      "label": "201 + código RES-…",
+      "variant": "return"
+    },
+    {
+      "id": "aviso",
+      "from": "pagina",
+      "to": "cliente",
+      "y": 624,
+      "label": "aviso y Mis reservas",
+      "variant": "return"
+    },
+    {
+      "id": "correos",
+      "from": "api",
+      "to": "gmail",
+      "y": 660,
+      "label": "aviso al negocio y al cliente",
+      "variant": "dashed",
+      "note": "después de responder; sin GMAIL_* no se envía"
+    }
+  ],
+  "activations": [
+    {
+      "participant": "pagina",
+      "from": 185,
+      "to": 630,
+      "type": "frontend"
+    },
+    {
+      "participant": "api",
+      "from": 190,
+      "to": 670,
+      "type": "backend"
+    },
+    {
+      "participant": "postgres",
+      "from": 235,
+      "to": 306,
+      "type": "database"
+    },
+    {
+      "participant": "postgres",
+      "from": 325,
+      "to": 392,
+      "type": "database"
+    },
+    {
+      "participant": "postgres",
+      "from": 413,
+      "to": 564,
+      "type": "database"
+    },
+    {
+      "participant": "gmail",
+      "from": 655,
+      "to": 690,
+      "type": "external"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Sin sobreventa",
+      "items": [
+        "El stock se descuenta solo si alcanza",
+        "Si un producto falla, no se guarda nada",
+        "Dos reservas a la vez se esperan una a la otra"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Reglas",
+      "items": [
+        "Fecha: día con atención y hasta 30 días",
+        "Máximo 5 reservas por retirar por cliente",
+        "Se cobra el precio vigente al reservar"
+      ]
+    },
+    {
+      "dot": "orange",
+      "title": "Correos",
+      "items": [
+        "Se envían después de responder al cliente",
+        "Un error de correo no anula la reserva"
+      ]
+    }
+  ]
+}

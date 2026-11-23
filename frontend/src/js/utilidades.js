@@ -14,6 +14,10 @@ const formatearFechaLarga = (fecha) => (fecha
   ? new Date(fecha).toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' })
   : '—');
 
+// Mayúscula solo en la primera letra ("Jueves, 19 de noviembre"); la clase
+// capitalize de CSS pondría "De Noviembre"
+const capitalizar = (texto) => texto.charAt(0).toUpperCase() + texto.slice(1);
+
 // Fecha local en formato YYYY-MM-DD (toISOString usa UTC y puede correr el día)
 const fechaISO = (fecha) => {
   const f = new Date(fecha);
@@ -32,6 +36,11 @@ const etiquetaEstado = (estado) => {
   const info = ESTADOS[estado];
   return `<span class="inline-block whitespace-nowrap rounded-full px-3 py-1 text-xs font-bold ${info?.clase || 'bg-neutral-100 text-neutral-700'}">${escaparHTML(info?.nombre || estado)}</span>`;
 };
+
+// ============ MOVIMIENTO ============
+// Las animaciones hechas desde JS revisan esto; las de CSS usan la media query
+const menosMovimiento = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const EASE_OUT = 'cubic-bezier(0.23, 1, 0.32, 1)';
 
 // ============ LLAMADAS A LA API ============
 // Envía la petición con el token, convierte la respuesta y lanza un Error con el
@@ -68,7 +77,7 @@ async function api(ruta, { method = 'GET', body, auth = true } = {}) {
 function mostrarCargando(contenedor, texto = 'Cargando…') {
   contenedor.innerHTML = `
     <div class="flex items-center justify-center gap-3 py-10 text-neutral-500" role="status">
-      <span class="h-5 w-5 animate-spin rounded-full border-2 border-neutral-300 border-t-bosque" aria-hidden="true"></span>
+      <span class="h-5 w-5 animate-spin rounded-full border-2 border-neutral-400/40 border-t-oro" aria-hidden="true"></span>
       ${escaparHTML(texto)}
     </div>`;
 }
@@ -101,7 +110,7 @@ const ESTILOS_MENSAJE = {
   success: 'bg-green-50 text-green-800 border border-green-200',
   error: 'bg-red-50 text-red-800 border border-red-200',
   warning: 'bg-amber-50 text-amber-800 border border-amber-200',
-  info: 'bg-blue-50 text-blue-800 border border-blue-200'
+  info: 'bg-papel text-madera-oscuro border border-oro/40'
 };
 
 function mostrarMensaje(mensaje, tipo = 'info') {
@@ -109,7 +118,11 @@ function mostrarMensaje(mensaje, tipo = 'info') {
   div.className = `rounded-md px-4 py-3 text-sm font-medium shadow-lg ${ESTILOS_MENSAJE[tipo] || ESTILOS_MENSAJE.info}`;
   div.textContent = mensaje;
   document.getElementById('avisos').appendChild(div);
-  setTimeout(() => div.remove(), tipo === 'error' ? 6000 : 3500);
+  // Primero se desvanece (200 ms, ver entrada.css) y después se quita
+  setTimeout(() => {
+    div.classList.add('saliendo');
+    setTimeout(() => div.remove(), 200);
+  }, tipo === 'error' ? 6000 : 3500);
 }
 
 function mostrarError(elementId, mensaje) {

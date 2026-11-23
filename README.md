@@ -28,6 +28,24 @@ pago en línea). Cada reserva le llega por correo al negocio.
 | Frontend | HTML + JavaScript sin framework, Tailwind CSS (compilado) |
 | Tests | Jest + Supertest, con base de datos propia |
 
+## Diagramas
+
+Generados con [Archify](https://github.com/tt-a1i/archify) a partir del código (cada
+caja enlaza a las líneas que la respaldan). Las imágenes son estáticas; para la versión
+interactiva, abre el `.html` de [docs/diagramas/](docs/diagramas/) en el navegador.
+
+**Arquitectura:** qué piezas hay y cómo se comunican.
+
+![Arquitectura del proyecto](docs/diagramas/arquitectura.svg)
+
+**Cómo se crea una reserva:** desde que el cliente confirma hasta que salen los correos.
+
+![Secuencia de una reserva](docs/diagramas/flujo-reserva.svg)
+
+Para actualizarlos después de cambiar el código, pídele a Claude Code
+"actualiza los diagramas de Archify en docs/diagramas". El contenido de cada
+diagrama está en su `.json` (por ejemplo `arquitectura.json`).
+
 ## Requisitos
 
 - Node.js 18 o superior
@@ -144,6 +162,7 @@ frontend/
   src/js/          lógica separada por área (catálogo, carrito, cuenta, admin, navegación…)
   src/css/         entrada.css (fuente) y estilos.css (compilado)
   src/img/         logo, fondo y fotos
+docs/diagramas/    diagramas de arquitectura y de la reserva (Archify)
 API_ENDPOINTS.md   documentación completa de la API
 ```
 

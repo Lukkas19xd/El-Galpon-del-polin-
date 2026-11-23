@@ -62,25 +62,28 @@ async function handleCambiarContrasena(event) {
 }
 
 // ============ MIS RESERVAS ============
+// Código de la reserva que se acaba de crear: su tarjeta entra con un brillo dorado
+let reservaRecienCreada = null;
+
 const tarjetaResumen = (titulo, valor) => `
   <div class="rounded-md bg-neutral-50 p-4 text-center shadow-sm">
     <p class="mb-1 text-sm font-semibold text-neutral-500">${titulo}</p>
-    <p class="text-2xl font-bold text-bosque">${valor}</p>
+    <p class="text-xl font-bold tabular-nums text-bosque [overflow-wrap:anywhere] sm:text-2xl">${valor}</p>
   </div>`;
 
 const tarjetaReserva = (pedido) => `
-  <article class="rounded-lg border border-neutral-200 bg-white p-4 shadow-sm">
+  <article data-codigo="${escaparHTML(pedido.numeroOrden)}" class="rounded-lg border border-neutral-200 bg-white p-4 shadow-sm">
     <div class="mb-2 flex flex-wrap items-center justify-between gap-2">
       <h3 class="font-bold text-bosque">${escaparHTML(pedido.numeroOrden)}</h3>
       ${etiquetaEstado(pedido.estado)}
     </div>
     <p class="mb-2 text-sm text-neutral-600">
-      Retiro: <strong class="capitalize">${formatearFechaLarga(pedido.fechaRetiro)}</strong>
+      Retiro: <strong>${capitalizar(formatearFechaLarga(pedido.fechaRetiro))}</strong>
       · Reservada el ${formatearFecha(pedido.createdAt)}
     </p>
     <ul class="mb-2 ml-5 list-disc text-sm text-neutral-700">
       ${(pedido.items || []).map((item) => `
-        <li>${escaparHTML(item.producto?.nombre || 'Producto')} × ${item.cantidad}</li>`).join('')}
+        <li class="[overflow-wrap:anywhere]">${escaparHTML(item.producto?.nombre || 'Producto')} × ${numeroCL.format(item.cantidad)}</li>`).join('')}
     </ul>
     <p class="text-right font-bold text-madera">${monedaCLP.format(pedido.total)}</p>
   </article>`;
@@ -110,6 +113,12 @@ async function cargarMisReservas() {
            <p class="mb-3">Todavía no tienes reservas.</p>
            <a href="#/productos" class="font-bold text-madera underline-offset-2 hover:underline">Ver productos</a>
          </div>`;
+
+    if (reservaRecienCreada) {
+      const nueva = lista.querySelector(`[data-codigo="${CSS.escape(reservaRecienCreada)}"]`);
+      reservaRecienCreada = null;
+      nueva?.classList.add('reserva-nueva');
+    }
   } catch (error) {
     mostrarFalla(lista, error.message, 'cargarMisReservas()');
   }
